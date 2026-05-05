@@ -1,0 +1,59 @@
+.form-card {
+  background: var(--bg-surface); border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl); padding: 28px; margin-bottom: 28px;
+  h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+}
+.session-form { display: flex; flex-direction: column; gap: 16px; }
+.select-field {
+  width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-default);
+  border-radius: var(--radius-md); color: var(--text-primary);
+  font-size: 13px; padding: 12px 14px; outline: none;
+  font-family: var(--font-sans); cursor: pointer;
+  &:focus { border-color: var(--accent); }
+  option { background: var(--bg-surface); }
+}
+.textarea-field { resize: vertical; min-height: 70px; }
+.form-footer { display: flex; justify-content: flex-end; }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+
+.filter-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-tab {
+  padding: 7px 16px; border-radius: 9999px; font-size: 13px; font-weight: 500;
+  background: none; border: 1px solid var(--border-default);
+  color: var(--text-secondary); cursor: pointer; transition: all 150ms;
+  &:hover { border-color: var(--accent); color: var(--accent); }
+  &.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+}
+
+.sessions-list { display: flex; flex-direction: column; gap: 12px; }
+.session-card {
+  background: var(--bg-surface); border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg); padding: 20px; transition: border-color 200ms;
+  border-left: 3px solid var(--border-default);
+  &.s-confirmada { border-left-color: var(--success); }
+  &.s-completada { border-left-color: var(--accent); opacity: 0.85; }
+  &.s-cancelada  { border-left-color: var(--danger);  opacity: 0.6;  }
+  &.s-pendiente  { border-left-color: var(--highlight); }
+}
+.session-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.status-badge {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; padding: 3px 10px; border-radius: 9999px;
+  &.sb-pendiente  { background: rgba(251,191,36,0.12);  color: var(--highlight); }
+  &.sb-confirmada { background: rgba(52,211,153,0.12);  color: var(--success);   }
+  &.sb-completada { background: var(--accent-dim);       color: var(--accent);    }
+  &.sb-cancelada  { background: rgba(248,113,113,0.1);  color: var(--danger);    }
+}
+.session-date { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+.session-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.session-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; }
+.session-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.meta-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text-muted);
+  background: var(--bg-elevated); border-radius: 9999px; padding: 4px 10px;
+  mat-icon { font-size: 14px; }
+  &.me { color: var(--accent); background: var(--accent-dim); }
+}
+.session-links { display: flex; gap: 8px; margin-bottom: 12px; }
+.session-actions { display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border-subtle); }

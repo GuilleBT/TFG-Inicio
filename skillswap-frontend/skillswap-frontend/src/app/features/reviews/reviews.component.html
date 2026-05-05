@@ -1,0 +1,100 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Reseñas ⭐</h1>
+      <p>Valora a tus mentores y comparte tu experiencia</p>
+    </div>
+    <button class="btn btn-primary" (click)="showForm = !showForm">
+      <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+      {{ showForm ? 'Cancelar' : 'Nueva reseña' }}
+    </button>
+  </div>
+
+  <!-- Create form -->
+  <div class="form-card" *ngIf="showForm">
+    <h2>Escribe una reseña</h2>
+    <form [formGroup]="createForm" (ngSubmit)="onSubmit()" class="review-form">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">ID del usuario valorado *</label>
+          <div class="input-wrapper">
+            <input type="number" formControlName="receptorId" class="input-field" placeholder="ID del usuario">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">ID de la sesión (opcional)</label>
+          <div class="input-wrapper">
+            <input type="number" formControlName="sesionId" class="input-field" placeholder="ID de la sesión">
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Puntuación *</label>
+        <div class="rating-picker">
+          <app-star-rating
+            [rating]="selectedRating"
+            [interactive]="true"
+            (ratingChange)="onRatingChange($event)">
+          </app-star-rating>
+          <span class="rating-text" *ngIf="selectedRating > 0">{{ selectedRating }}/5</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Comentario * (mínimo 10 caracteres)</label>
+        <div class="input-wrapper">
+          <textarea formControlName="comentario" rows="4" class="input-field textarea-field"
+                    placeholder="Describe tu experiencia con este mentor..."></textarea>
+        </div>
+        <span class="field-error"
+          *ngIf="createForm.get('comentario')?.hasError('minlength') && createForm.get('comentario')?.touched">
+          Mínimo 10 caracteres
+        </span>
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving">
+          <span class="spinner" *ngIf="saving"></span>
+          <mat-icon *ngIf="!saving">star</mat-icon>
+          {{ saving ? 'Publicando...' : 'Publicar reseña' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-lg"></div><span>Cargando reseñas...</span>
+  </div>
+
+  <!-- Empty -->
+  <div class="empty-state" *ngIf="!loading && myReviews.length === 0">
+    <span class="empty-icon">⭐</span>
+    <h3>Sin reseñas todavía</h3>
+    <p>Completa sesiones con tus matches y valora la experiencia.</p>
+  </div>
+
+  <!-- List -->
+  <div class="reviews-list" *ngIf="!loading && myReviews.length > 0">
+    <div class="review-card" *ngFor="let r of myReviews">
+      <div class="review-head">
+        <div class="review-avatar">{{ r.autorNombre?.[0] ?? '?' }}</div>
+        <div class="review-meta">
+          <span class="review-author">{{ r.autorNombre }}</span>
+          <span class="review-receptor">→ {{ r.receptorId }}</span>
+          <app-star-rating [rating]="r.puntuacion"></app-star-rating>
+        </div>
+        <span class="review-date font-mono">{{ r.creadoEn | date:'dd/MM/yy' }}</span>
+        <button class="btn btn-ghost btn-icon"
+          *ngIf="r.autorId === authService.currentUser()?.id"
+          (click)="deleteReview(r.id)"
+          title="Eliminar reseña">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
+      <p class="review-comment">{{ r.comentario }}</p>
+      <span class="tech-chip" *ngIf="r.tecnologia">{{ r.tecnologia.nombre }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,183 @@
+<div class="auth-page">
+  <div class="auth-card register-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <span class="logo-icon">⇄</span>
+      <span class="logo-text">Skill<span class="logo-accent">Swap</span></span>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="(step / totalSteps) * 100"></div>
+    </div>
+    <div class="step-indicator">
+      <span class="step-current">Paso {{ step }}</span>
+      <span class="step-total"> de {{ totalSteps }}</span>
+    </div>
+
+    <!-- Error -->
+    <div class="error-alert" *ngIf="errorMessage">
+      <mat-icon>error_outline</mat-icon>
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Step 1: Datos personales -->
+      <div *ngIf="step === 1">
+        <div class="auth-header">
+          <h1>Tu información</h1>
+          <p>Cuéntanos quién eres</p>
+        </div>
+        <div class="auth-form">
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Nombre</label>
+              <div class="input-wrapper" [class.error]="form.get('nombre')?.invalid && form.get('nombre')?.touched">
+                <mat-icon class="input-icon">person_outline</mat-icon>
+                <input type="text" formControlName="nombre" placeholder="Ana" class="input-field">
+              </div>
+              <span class="field-error" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">
+                Mínimo 2 caracteres
+              </span>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Apellido</label>
+              <div class="input-wrapper" [class.error]="form.get('apellido')?.invalid && form.get('apellido')?.touched">
+                <mat-icon class="input-icon">person_outline</mat-icon>
+                <input type="text" formControlName="apellido" placeholder="García" class="input-field">
+              </div>
+              <span class="field-error" *ngIf="form.get('apellido')?.invalid && form.get('apellido')?.touched">
+                Mínimo 2 caracteres
+              </span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Username</label>
+            <div class="input-wrapper" [class.error]="form.get('username')?.invalid && form.get('username')?.touched">
+              <!-- register.component.html (Aproximadamente línea 59) -->
+        <div class="input-group">
+          <span class="input-prefix">&#64;</span>
+          <input type="text" id="username" formControlName="username" placeholder="tu_usuario">
+        </div>
+              <input type="text" formControlName="username" placeholder="ana_garcia" class="input-field">
+            </div>
+            <span class="field-error" *ngIf="form.get('username')?.hasError('pattern') && form.get('username')?.touched">
+              Solo letras, números y guiones bajos
+            </span>
+            <span class="field-error" *ngIf="form.get('username')?.hasError('minlength') && form.get('username')?.touched">
+              Mínimo 3 caracteres
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Credenciales -->
+      <div *ngIf="step === 2">
+        <div class="auth-header">
+          <h1>Acceso seguro</h1>
+          <p>Crea tus credenciales</p>
+        </div>
+        <div class="auth-form">
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <div class="input-wrapper" [class.error]="form.get('email')?.invalid && form.get('email')?.touched">
+              <mat-icon class="input-icon">mail_outline</mat-icon>
+              <input type="email" formControlName="email" placeholder="ana@email.com" autocomplete="email" class="input-field">
+            </div>
+            <span class="field-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+              Email inválido
+            </span>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Contraseña</label>
+            <div class="input-wrapper" [class.error]="form.get('password')?.invalid && form.get('password')?.touched">
+              <mat-icon class="input-icon">lock_outline</mat-icon>
+              <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" class="input-field">
+              <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1">
+                <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </div>
+            <span class="field-error" *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched">
+              Mínimo 8 caracteres
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Skills -->
+      <div *ngIf="step === 3">
+        <div class="auth-header">
+          <h1>Tu perfil técnico</h1>
+          <p>Define tu identidad como developer</p>
+        </div>
+
+        <div class="skills-section">
+          <div class="skills-block">
+            <p class="section-label">¿Qué tecnologías dominas?</p>
+            <p class="skills-hint">Selecciona las que puedes enseñar</p>
+            <div class="tech-grid">
+              <button
+                type="button"
+                *ngFor="let tech of tecnologias"
+                class="tech-btn"
+                [class.selected-skill]="isHabilidadSelected(tech.id)"
+                [class.disabled-btn]="isInteresSelected(tech.id)"
+                [disabled]="isInteresSelected(tech.id)"
+                (click)="toggleHabilidad(tech.id)">
+                {{ tech.nombre }}
+                <mat-icon *ngIf="isHabilidadSelected(tech.id)" class="check-icon">check</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="skills-block">
+            <p class="section-label">¿Qué quieres aprender?</p>
+            <p class="skills-hint">Selecciona tus intereses</p>
+            <div class="tech-grid">
+              <button
+                type="button"
+                *ngFor="let tech of tecnologias"
+                class="tech-btn"
+                [class.selected-interest]="isInteresSelected(tech.id)"
+                [class.disabled-btn]="isHabilidadSelected(tech.id)"
+                [disabled]="isHabilidadSelected(tech.id)"
+                (click)="toggleInteres(tech.id)">
+                {{ tech.nombre }}
+                <mat-icon *ngIf="isInteresSelected(tech.id)" class="check-icon">check</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="step-nav">
+        <button type="button" class="btn-outline btn" *ngIf="step > 1" (click)="prevStep()">
+          ← Atrás
+        </button>
+        <span *ngIf="step === 1"></span>
+
+        <button type="button" class="btn-primary btn" *ngIf="step === 1" (click)="nextStep()" [disabled]="!step1Valid()">
+          Continuar →
+        </button>
+        <button type="button" class="btn-primary btn" *ngIf="step === 2" (click)="nextStep()" [disabled]="!step2Valid()">
+          Continuar →
+        </button>
+        <button type="submit" class="btn-primary btn submit-btn" *ngIf="step === 3" [class.loading]="loading" [disabled]="loading">
+          <span class="spinner" *ngIf="loading"></span>
+          <span *ngIf="!loading">¡Empezar! 🚀</span>
+          <span *ngIf="loading">Creando cuenta...</span>
+        </button>
+      </div>
+
+    </form>
+
+    <p class="auth-footer">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login">Inicia sesión</a>
+    </p>
+
+  </div>
+</div>

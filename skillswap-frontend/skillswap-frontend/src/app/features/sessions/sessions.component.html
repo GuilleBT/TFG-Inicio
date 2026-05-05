@@ -1,0 +1,151 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Mis Sesiones 📅</h1>
+      <p>Gestiona tus intercambios de conocimiento</p>
+    </div>
+    <button class="btn btn-primary" (click)="showForm = !showForm">
+      <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+      {{ showForm ? 'Cancelar' : 'Nueva sesión' }}
+    </button>
+  </div>
+
+  <!-- Create form -->
+  <div class="form-card" *ngIf="showForm">
+    <h2>Nueva sesión de mentoring</h2>
+    <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()" class="session-form">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">ID del receptor *</label>
+          <div class="input-wrapper">
+            <input type="number" formControlName="receptorId" class="input-field" placeholder="ID del usuario">
+          </div>
+          <span class="field-hint" *ngIf="receptorNombreParam">Con: {{ receptorNombreParam }}</span>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Tecnología</label>
+          <select formControlName="tecnologiaId" class="select-field">
+            <option value="">Sin especificar</option>
+            <option *ngFor="let t of tecnologias" [value]="t.id">{{ t.nombre }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Título *</label>
+        <div class="input-wrapper">
+          <input type="text" formControlName="titulo" class="input-field" placeholder="Ej: Intro a Spring Boot">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Descripción</label>
+        <div class="input-wrapper">
+          <textarea formControlName="descripcion" rows="2" class="input-field textarea-field"
+                    placeholder="¿Qué vais a trabajar en la sesión?"></textarea>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Fecha y hora *</label>
+          <div class="input-wrapper">
+            <input type="datetime-local" formControlName="fechaHora" class="input-field">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Duración (min)</label>
+          <div class="input-wrapper">
+            <input type="number" formControlName="duracionMinutos" class="input-field" min="15" step="15">
+          </div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Enlace Meeting</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">video_call</mat-icon>
+            <input type="url" formControlName="enlaceMeeting" class="input-field" placeholder="https://meet.google.com/...">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Enlace GitHub</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">code</mat-icon>
+            <input type="url" formControlName="enlaceGithub" class="input-field" placeholder="https://github.com/...">
+          </div>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving">
+          <span class="spinner" *ngIf="saving"></span>
+          <mat-icon *ngIf="!saving">send</mat-icon>
+          {{ saving ? 'Enviando...' : 'Crear sesión' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs" *ngIf="sessions.length > 0">
+    <button class="filter-tab"
+      *ngFor="let e of ['TODAS','PENDIENTE','CONFIRMADA','COMPLETADA','CANCELADA']"
+      [class.active]="filterEstado === e"
+      (click)="filterEstado = e">
+      {{ e === 'TODAS' ? 'Todas' : statusLabel(e) }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-lg"></div><span>Cargando sesiones...</span>
+  </div>
+
+  <!-- Empty -->
+  <div class="empty-state" *ngIf="!loading && filteredSessions.length === 0">
+    <span class="empty-icon">📅</span>
+    <h3>No hay sesiones</h3>
+    <p>Crea tu primera sesión desde la página de Matches.</p>
+  </div>
+
+  <!-- List -->
+  <div class="sessions-list" *ngIf="!loading">
+    <div class="session-card" *ngFor="let s of filteredSessions" [class]="'s-' + s.estado.toLowerCase()">
+      <div class="session-head">
+        <span class="status-badge" [class]="'sb-' + s.estado.toLowerCase()">
+          {{ statusLabel(s.estado) }}
+        </span>
+        <span class="session-date font-mono">{{ s.fechaHora | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <h3 class="session-title">{{ s.titulo }}</h3>
+      <p class="session-desc" *ngIf="s.descripcion">{{ s.descripcion }}</p>
+      <div class="session-meta">
+        <span class="meta-chip"><mat-icon>schedule</mat-icon>{{ s.duracionMinutos }} min</span>
+        <span class="meta-chip" *ngIf="s.tecnologia">{{ s.tecnologia.nombre }}</span>
+        <span class="meta-chip" [class.me]="isMyRequest(s)">
+          <mat-icon>{{ isMyRequest(s) ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          {{ isMyRequest(s) ? ('Para: ' + s.receptorNombre) : ('De: ' + s.solicitanteNombre) }}
+        </span>
+      </div>
+      <div class="session-links" *ngIf="s.enlaceMeeting || s.enlaceGithub">
+        <a *ngIf="s.enlaceMeeting" [href]="s.enlaceMeeting" target="_blank" class="btn btn-ghost btn-sm">
+          <mat-icon>video_call</mat-icon> Meeting
+        </a>
+        <a *ngIf="s.enlaceGithub" [href]="s.enlaceGithub" target="_blank" class="btn btn-ghost btn-sm">
+          <mat-icon>code</mat-icon> GitHub
+        </a>
+      </div>
+      <div class="session-actions">
+        <button class="btn btn-primary btn-sm"
+          *ngIf="!isMyRequest(s) && s.estado === 'PENDIENTE'" (click)="confirm(s)">
+          <mat-icon>check</mat-icon> Confirmar
+        </button>
+        <button class="btn btn-outline btn-sm"
+          *ngIf="s.estado === 'CONFIRMADA'" (click)="complete(s)">
+          <mat-icon>done_all</mat-icon> Completar
+        </button>
+        <button class="btn btn-ghost btn-sm"
+          *ngIf="s.estado === 'PENDIENTE' || s.estado === 'CONFIRMADA'" (click)="cancel(s)">
+          <mat-icon>cancel</mat-icon> Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

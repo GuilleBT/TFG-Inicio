@@ -1,0 +1,78 @@
+<nav class="navbar">
+  <div class="navbar-inner container">
+    <a class="navbar-logo" routerLink="/matching">
+      <span class="logo-icon">⇄</span>
+      <span class="logo-text">Skill<span class="logo-accent">Swap</span></span>
+    </a>
+
+    <div class="navbar-links">
+      <a
+        *ngFor="let link of navLinks"
+        class="nav-link"
+        [routerLink]="link.path"
+        routerLinkActive="active">
+        <mat-icon class="nav-icon">{{ link.icon }}</mat-icon>
+        <span>{{ link.label }}</span>
+      </a>
+    </div>
+
+    <div class="navbar-user">
+      <a class="user-avatar-btn" [routerLink]="'/profile'" [matMenuTriggerFor]="userMenu">
+        <div class="avatar-circle" *ngIf="!currentUser()?.avatarUrl">
+          {{ getInitials() }}
+        </div>
+        <img
+          *ngIf="currentUser()?.avatarUrl"
+          [src]="currentUser()?.avatarUrl"
+          [alt]="currentUser()?.nombre"
+          class="avatar-img"
+        />
+        <span class="user-name">{{ currentUser()?.nombre }}</span>
+        <mat-icon class="chevron">expand_more</mat-icon>
+      </a>
+
+      <mat-menu #userMenu="matMenu" class="user-dropdown">
+        <a mat-menu-item routerLink="/profile">
+          <mat-icon>person</mat-icon>
+          <span>Mi Perfil</span>
+        </a>
+        <a mat-menu-item routerLink="/sessions">
+          <mat-icon>event</mat-icon>
+          <span>Mis Sesiones</span>
+        </a>
+        <div class="menu-divider"></div>
+        <button mat-menu-item (click)="logout()" class="logout-item">
+          <mat-icon>logout</mat-icon>
+          <span>Cerrar sesión</span>
+        </button>
+      </mat-menu>
+
+      <button class="hamburger" (click)="toggleMobileMenu()" aria-label="Menu">
+        <span [class.open]="mobileMenuOpen"></span>
+        <span [class.open]="mobileMenuOpen"></span>
+        <span [class.open]="mobileMenuOpen"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" [class.open]="mobileMenuOpen">
+    <a
+      *ngFor="let link of navLinks"
+      class="mobile-nav-link"
+      [routerLink]="link.path"
+      routerLinkActive="active"
+      (click)="mobileMenuOpen = false">
+      <mat-icon>{{ link.icon }}</mat-icon>
+      <span>{{ link.label }}</span>
+    </a>
+    <div class="mobile-divider"></div>
+    <a class="mobile-nav-link" routerLink="/profile" (click)="mobileMenuOpen = false">
+      <mat-icon>person</mat-icon>
+      <span>Mi Perfil</span>
+    </a>
+    <button class="mobile-logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar sesión</span>
+    </button>
+  </div>
+</nav> 
