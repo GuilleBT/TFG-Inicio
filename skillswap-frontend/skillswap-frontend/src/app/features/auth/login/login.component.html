@@ -1,0 +1,81 @@
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <span class="logo-icon">⇄</span>
+      <span class="logo-text">Skill<span class="logo-accent">Swap</span></span>
+    </div>
+
+    <div class="auth-header">
+      <h1>Bienvenido de vuelta</h1>
+      <p>Inicia sesión para seguir aprendiendo</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-alert" *ngIf="errorMessage">
+      <mat-icon>error_outline</mat-icon>
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <div class="input-wrapper" [class.error]="form.get('email')?.invalid && form.get('email')?.touched">
+          <mat-icon class="input-icon">mail_outline</mat-icon>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="tu@email.com"
+            autocomplete="email"
+            class="input-field"
+          />
+        </div>
+        <span class="field-error" *ngIf="form.get('email')?.hasError('email') && form.get('email')?.touched">
+          Introduce un email válido
+        </span>
+        <span class="field-error" *ngIf="form.get('email')?.hasError('required') && form.get('email')?.touched">
+          El email es obligatorio
+        </span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Contraseña</label>
+        <div class="input-wrapper" [class.error]="form.get('password')?.invalid && form.get('password')?.touched">
+          <mat-icon class="input-icon">lock_outline</mat-icon>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            class="input-field"
+          />
+          <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
+        <span class="field-error" *ngIf="form.get('password')?.hasError('required') && form.get('password')?.touched">
+          La contraseña es obligatoria
+        </span>
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary btn submit-btn"
+        [class.loading]="loading"
+        [disabled]="loading">
+        <span class="spinner" *ngIf="loading"></span>
+        <span *ngIf="!loading">Iniciar sesión →</span>
+        <span *ngIf="loading">Entrando...</span>
+      </button>
+
+    </form>
+
+    <p class="auth-footer">
+      ¿No tienes cuenta?
+      <a routerLink="/register">Regístrate gratis</a>
+    </p>
+
+  </div>
+</div>

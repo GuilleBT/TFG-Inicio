@@ -1,0 +1,104 @@
+<div class="user-card" *ngIf="displayUser">
+
+  <!-- Match score badge -->
+  <div class="match-score" *ngIf="match && showMatchScore">
+    <span class="score-value">{{ match.puntuacionMatch }}%</span>
+    <span class="score-label">match</span>
+  </div>
+
+  <!-- Header -->
+  <div class="card-header">
+    <a [routerLink]="['/profile', displayUser.id]" class="avatar-link">
+      <div class="avatar" *ngIf="!displayUser.avatarUrl">{{ initials }}</div>
+      <img *ngIf="displayUser.avatarUrl" [src]="displayUser.avatarUrl" [alt]="displayUser.nombre" class="avatar-img">
+    </a>
+    <div class="user-info">
+      <a [routerLink]="['/profile', displayUser.id]" class="user-name">
+        {{ displayUser.nombre }} {{ displayUser.apellido }}
+      </a>
+  <span class="username font-mono">&#64;{{ displayUser.username }}</span>      <div class="user-meta" *ngIf="displayUser.ubicacion || displayUser.valoracionMedia">
+        <span *ngIf="displayUser.ubicacion" class="location">
+          <mat-icon class="meta-icon">place</mat-icon>
+          {{ displayUser.ubicacion }}
+        </span>
+        <app-star-rating
+          *ngIf="displayUser.valoracionMedia"
+          [rating]="displayUser.valoracionMedia"
+          [showCount]="true"
+          [count]="displayUser.totalResenas">
+        </app-star-rating>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bio -->
+  <p class="bio" *ngIf="displayUser.bio">{{ displayUser.bio }}</p>
+
+  <!-- Skills & Interests from match context -->
+  <div class="skills-section" *ngIf="match">
+    <div class="skills-group" *ngIf="match.habilidadesQueOfrece.length">
+      <span class="skills-label">Te puede enseñar</span>
+      <div class="chips">
+        <app-skill-chip
+          *ngFor="let tech of match.habilidadesQueOfrece"
+          [tecnologia]="tech"
+          variant="skill">
+        </app-skill-chip>
+      </div>
+    </div>
+    <div class="skills-group" *ngIf="match.habilidadesQueNecesita.length">
+      <span class="skills-label">Quiere aprender</span>
+      <div class="chips">
+        <app-skill-chip
+          *ngFor="let tech of match.habilidadesQueNecesita"
+          [tecnologia]="tech"
+          variant="interest">
+        </app-skill-chip>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skills from profile context -->
+  <div class="skills-section" *ngIf="!match">
+    <div class="skills-group" *ngIf="displayUser.habilidades?.length">
+      <span class="skills-label">Domina</span>
+      <div class="chips">
+        <app-skill-chip
+          *ngFor="let tech of displayUser.habilidades.slice(0, 4)"
+          [tecnologia]="tech"
+          variant="skill">
+        </app-skill-chip>
+      </div>
+    </div>
+    <div class="skills-group" *ngIf="displayUser.intereses?.length">
+      <span class="skills-label">Aprende</span>
+      <div class="chips">
+        <app-skill-chip
+          *ngFor="let tech of displayUser.intereses.slice(0, 4)"
+          [tecnologia]="tech"
+          variant="interest">
+        </app-skill-chip>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="card-footer">
+    <div class="stats" *ngIf="displayUser.sesionesCompletadas !== undefined">
+      <span class="stat">
+        <mat-icon class="stat-icon">check_circle</mat-icon>
+        {{ displayUser.sesionesCompletadas }} sesiones
+      </span>
+    </div>
+    <div class="actions">
+      <a [routerLink]="['/profile', displayUser.id]" class="btn-ghost btn">
+        <mat-icon>person</mat-icon>
+        Ver perfil
+      </a>
+      <button class="btn-primary btn" (click)="onRequestSession()">
+        <mat-icon>event</mat-icon>
+        Sesión
+      </button>
+    </div>
+  </div>
+</div>

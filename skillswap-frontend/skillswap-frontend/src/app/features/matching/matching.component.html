@@ -1,0 +1,59 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Encuentra tu Match ⇄</h1>
+      <p>Personas cuyas habilidades complementan exactamente las tuyas</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <mat-icon class="search-icon">search</mat-icon>
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      placeholder="Buscar por nombre o tecnología..."
+      class="search-input"
+    />
+    <button class="btn btn-ghost btn-sm" *ngIf="searchQuery" (click)="searchQuery = ''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-lg"></div>
+    <span>Buscando matches...</span>
+  </div>
+
+  <!-- Error -->
+  <div class="error-alert" *ngIf="error && !loading">
+    <mat-icon>error_outline</mat-icon>
+    Error al cargar los matches. {{ error }}
+    <button class="btn btn-ghost btn-sm" (click)="loadMatches()">Reintentar</button>
+  </div>
+
+  <!-- Empty -->
+  <div class="empty-state" *ngIf="!loading && !error && filteredMatches.length === 0">
+    <span class="empty-icon">🔍</span>
+    <h3>No hay matches disponibles</h3>
+    <p *ngIf="matches.length === 0">
+      Completa tu perfil con habilidades e intereses para encontrar compañeros.
+    </p>
+    <p *ngIf="matches.length > 0">Ningún match coincide con la búsqueda.</p>
+  </div>
+
+  <!-- Count -->
+  <div class="match-count font-mono" *ngIf="!loading && filteredMatches.length > 0">
+    {{ filteredMatches.length }} match{{ filteredMatches.length !== 1 ? 'es' : '' }} encontrado{{ filteredMatches.length !== 1 ? 's' : '' }}
+  </div>
+
+  <!-- Grid -->
+  <div class="cards-grid" *ngIf="!loading && filteredMatches.length > 0">
+    <app-user-card
+      *ngFor="let match of filteredMatches"
+      [match]="match"
+      (requestSession)="onRequestSession($event)">
+    </app-user-card>
+  </div>
+</div>

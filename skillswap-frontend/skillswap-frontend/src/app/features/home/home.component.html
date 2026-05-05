@@ -1,0 +1,119 @@
+<div class="home">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Red de trueque de conocimiento técnico
+      </div>
+
+      <h1 class="hero-title">
+        Intercambia lo que<br>
+        <span class="title-accent">sabes</span> por lo que<br>
+        quieres <span class="title-accent">aprender.</span>
+      </h1>
+
+      <p class="hero-desc">
+        Conecta con desarrolladores que dominan lo que tú quieres aprender
+        y enséñales lo que tú dominas. Sin coste, sin intermediarios,
+        solo conocimiento real de persona a persona.
+      </p>
+
+      <div class="hero-cta">
+        <a routerLink="/register" class="btn-primary btn btn-lg">
+          Empieza gratis
+          <span class="btn-arrow">→</span>
+        </a>
+        <a routerLink="/login" class="btn-outline btn btn-lg">
+          Iniciar sesión
+        </a>
+      </div>
+
+      <!-- Floating tech badges -->
+      <div class="tech-float" aria-hidden="true">
+        <span class="tech-badge" style="--delay: 0s; --x: 10%; --y: 20%">Java</span>
+        <span class="tech-badge" style="--delay: 0.5s; --x: 80%; --y: 10%">Angular</span>
+        <span class="tech-badge" style="--delay: 1s; --x: 15%; --y: 75%">Spring Boot</span>
+        <span class="tech-badge" style="--delay: 1.5s; --x: 75%; --y: 70%">React</span>
+        <span class="tech-badge" style="--delay: 0.8s; --x: 50%; --y: 5%">Python</span>
+        <span class="tech-badge" style="--delay: 0.3s; --x: 88%; --y: 45%">Docker</span>
+        <span class="tech-badge" style="--delay: 1.2s; --x: 5%; --y: 50%">TypeScript</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item" *ngFor="let stat of stats">
+          <span class="stat-value">{{ stat.value }}</span>
+          <span class="stat-label">{{ stat.label }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-section">
+    <div class="container">
+      <p class="section-label">Cómo funciona</p>
+      <h2 class="section-title">Tres pasos para empezar</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3>Crea tu perfil técnico</h3>
+            <p>Define qué tecnologías dominas y cuáles quieres aprender. Sé honesto, el algoritmo de matching lo agradece.</p>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3>Encuentra tu match</h3>
+            <p>El sistema te sugiere personas cuyas habilidades complementan perfectamente las tuyas. Intercambio recíproco garantizado.</p>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3>Aprende y enseña</h3>
+            <p>Agenda sesiones virtuales, comparte recursos y valora la experiencia. Construye tu reputación técnica.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section">
+    <div class="container">
+      <p class="section-label">Características</p>
+      <h2 class="section-title">Todo lo que necesitas</h2>
+      <div class="features-grid">
+        <div class="feature-card" *ngFor="let f of features; let i = index" [style.--delay]="i * 0.1 + 's'">
+          <span class="feature-icon">{{ f.icon }}</span>
+          <h3 class="feature-title">{{ f.title }}</h3>
+          <p class="feature-desc">{{ f.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA final -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <h2>¿Listo para el trueque?</h2>
+        <p>Únete y empieza a crecer técnicamente con la comunidad.</p>
+        <a routerLink="/register" class="btn-primary btn btn-lg">
+          Crear cuenta gratis →
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>

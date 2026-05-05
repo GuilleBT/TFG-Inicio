@@ -1,0 +1,26 @@
+package com.example.trabajofinalgrado.Model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name = "tecnologias")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Tecnologia {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true)
+    private String nombre;
+    
+    private String iconoUrl;
+
+
+}

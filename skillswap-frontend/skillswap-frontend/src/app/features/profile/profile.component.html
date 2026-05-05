@@ -1,0 +1,152 @@
+<div class="loading-state" *ngIf="loading">
+  <div class="spinner-lg"></div>
+  <span>Cargando perfil...</span>
+</div>
+
+<div class="page" *ngIf="!loading && profile">
+
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="avatar-large" *ngIf="!profile.avatarUrl">{{ initials }}</div>
+    <img *ngIf="profile.avatarUrl" [src]="profile.avatarUrl" class="avatar-img-large" [alt]="profile.nombre">
+    <div class="profile-info">
+      <div class="name-row">
+        <h1>{{ profile.nombre }} {{ profile.apellido }}</h1>
+<!-- profile.component.html (Aproximadamente línea 15) -->
+    <span class="username font-mono">&#64;{{ profile.username }}</span>      </div>
+      <p class="bio" *ngIf="profile.bio">{{ profile.bio }}</p>
+      <div class="meta-row">
+        <span class="meta-item" *ngIf="profile.ubicacion">
+          <mat-icon>place</mat-icon> {{ profile.ubicacion }}
+        </span>
+        <a class="meta-item link" *ngIf="profile.github"
+           [href]="'https://github.com/' + profile.github" target="_blank">
+          <mat-icon>code</mat-icon> {{ profile.github }}
+        </a>
+        <span class="meta-item" *ngIf="profile.valoracionMedia">
+          <mat-icon>star</mat-icon> {{ profile.valoracionMedia | number:'1.1-1' }}
+          ({{ profile.totalResenas }} reseñas)
+        </span>
+        <span class="meta-item" *ngIf="profile.sesionesCompletadas">
+          <mat-icon>check_circle</mat-icon> {{ profile.sesionesCompletadas }} sesiones
+        </span>
+      </div>
+      <div class="actions" *ngIf="!editMode">
+        <button class="btn btn-primary" *ngIf="isOwnProfile" (click)="startEdit()">
+          <mat-icon>edit</mat-icon> Editar perfil
+        </button>
+        <button class="btn btn-outline" *ngIf="!isOwnProfile" (click)="requestSession()">
+          <mat-icon>event</mat-icon> Pedir sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit form -->
+  <div class="edit-card" *ngIf="editMode && editForm">
+    <h2>Editar perfil</h2>
+    <form [formGroup]="editForm" class="edit-form">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Nombre</label>
+          <div class="input-wrapper"><input formControlName="nombre" class="input-field"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Apellido</label>
+          <div class="input-wrapper"><input formControlName="apellido" class="input-field"></div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Sobre mí</label>
+        <div class="input-wrapper">
+          <textarea formControlName="bio" rows="3" class="input-field textarea-field"
+                    placeholder="Cuéntanos algo..."></textarea>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Ubicación</label>
+          <div class="input-wrapper"><input formControlName="ubicacion" class="input-field" placeholder="Madrid, España"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">GitHub username</label>
+          <div class="input-wrapper"><input formControlName="github" class="input-field"></div>
+        </div>
+      </div>
+
+      <div class="skills-edit-grid">
+        <div class="skills-block">
+          <p class="section-label">Lo que dominas</p>
+          <div class="tech-grid">
+            <button type="button" *ngFor="let t of tecnologias" class="tech-btn"
+              [class.selected-skill]="selectedHabilidades.has(t.id)"
+              [class.disabled-btn]="selectedIntereses.has(t.id)"
+              [disabled]="selectedIntereses.has(t.id)"
+              (click)="toggleHabilidad(t.id)">
+              {{ t.nombre }}
+            </button>
+          </div>
+        </div>
+        <div class="skills-block">
+          <p class="section-label">Lo que quieres aprender</p>
+          <div class="tech-grid">
+            <button type="button" *ngFor="let t of tecnologias" class="tech-btn"
+              [class.selected-interest]="selectedIntereses.has(t.id)"
+              [class.disabled-btn]="selectedHabilidades.has(t.id)"
+              [disabled]="selectedHabilidades.has(t.id)"
+              (click)="toggleInteres(t.id)">
+              {{ t.nombre }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-actions">
+        <button type="button" class="btn btn-ghost" (click)="cancelEdit()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="saveEdit()">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Skills (view) -->
+  <div class="skills-row" *ngIf="!editMode">
+    <div class="info-card">
+      <h3>🎯 Domina</h3>
+      <div class="chips-wrap" *ngIf="profile.habilidades?.length; else noSkills">
+        <app-skill-chip *ngFor="let t of profile.habilidades" [tecnologia]="t" variant="skill"></app-skill-chip>
+      </div>
+      <ng-template #noSkills><p class="empty-chips">Sin habilidades definidas</p></ng-template>
+    </div>
+    <div class="info-card">
+      <h3>📚 Quiere aprender</h3>
+      <div class="chips-wrap" *ngIf="profile.intereses?.length; else noInterests">
+        <app-skill-chip *ngFor="let t of profile.intereses" [tecnologia]="t" variant="interest"></app-skill-chip>
+      </div>
+      <ng-template #noInterests><p class="empty-chips">Sin intereses definidos</p></ng-template>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="reviews-section" *ngIf="!editMode">
+    <h2>Reseñas
+      <span class="review-count">({{ reviews.length }})</span>
+    </h2>
+    <div class="empty-state" *ngIf="reviews.length === 0">
+      <span class="empty-icon">⭐</span>
+      <p>Aún no hay reseñas para este perfil</p>
+    </div>
+    <div class="reviews-list">
+      <div class="review-card" *ngFor="let r of reviews">
+        <div class="review-header">
+          <div class="review-avatar">{{ r.autorNombre?.[0] ?? '?' }}</div>
+          <div>
+            <span class="review-author">{{ r.autorNombre }}</span>
+            <app-star-rating [rating]="r.puntuacion"></app-star-rating>
+          </div>
+          <span class="review-date font-mono">{{ r.creadoEn | date:'dd/MM/yy' }}</span>
+        </div>
+        <p class="review-comment">{{ r.comentario }}</p>
+      </div>
+    </div>
+  </div>
+</div>
