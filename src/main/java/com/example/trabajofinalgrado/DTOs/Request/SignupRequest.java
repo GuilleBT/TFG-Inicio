@@ -28,7 +28,11 @@ public class SignupRequest {
 
     private Set<String> role;
 
-    // AQUÍ AÑADIMOS LAS TECNOLOGÍAS
-    private List<Long> tecnologiasDominaIds;
     private List<Long> tecnologiasAprendeIds;
+
+    private String experienciaBreve;
+    private String imagenPerfil;
+
+  
+    private List<TecnologiaDetalleRequest> tecnologiasDomina;
 }

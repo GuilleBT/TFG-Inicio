@@ -25,6 +25,14 @@ export interface UserProfile {
   activo?: boolean;
 }
 
+// ─── NUEVO: MOLDE PARA LOS DETALLES DE LA TECNOLOGÍA AL REGISTRARSE ───
+export interface TecnologiaDetalleRequest {
+  tecnologiaId: number;
+  nivel: string;
+  aniosExperiencia: number;
+  puntosFuertes: string;
+}
+
 // ─── LO QUE EL BACKEND DEVUELVE EN /auth/signin ───────────────────
 // { token, type, id, username, email, roles[] }
 export interface AuthResponse {
@@ -43,15 +51,23 @@ export interface AuthRequest {
   password: string;
 }
 
-// ─── LO QUE EL FRONTEND ENVÍA AL REGISTRARSE ──────────────────────
-// El backend espera tecnologiasDominaIds / tecnologiasAprendeIds
+
 export interface RegisterRequest {
   nombre: string;
   apellido: string;
   email: string;
   username: string;
   password: string;
-  tecnologiasDominaIds: number[];
+  
+  // --- LOS CAMPOS NUEVOS ---
+  experienciaBreve?: string; // Opcional
+  imagenPerfil?: string;     // Opcional (Base64)
+  
+  // --- ¡CAMBIO CLAVE AQUÍ! ---
+  // Ahora es un array del nuevo molde, ya no son solo números
+  tecnologiasDomina: TecnologiaDetalleRequest[]; 
+  
+  // Este se queda igual, como una lista de IDs (números)
   tecnologiasAprendeIds: number[];
 }
 

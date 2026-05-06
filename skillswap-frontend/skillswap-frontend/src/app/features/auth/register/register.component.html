@@ -56,12 +56,10 @@
           <div class="field-group">
             <label class="field-label">Username</label>
             <div class="input-wrapper" [class.error]="form.get('username')?.invalid && form.get('username')?.touched">
-              <!-- register.component.html (Aproximadamente línea 59) -->
-        <div class="input-group">
-          <span class="input-prefix">&#64;</span>
-          <input type="text" id="username" formControlName="username" placeholder="tu_usuario">
-        </div>
-              <input type="text" formControlName="username" placeholder="ana_garcia" class="input-field">
+              <div class="input-group" style="display: flex; align-items: center; width: 100%;">
+                <span class="input-prefix" style="padding-left: 12px; color: #888;">&#64;</span>
+                <input type="text" id="username" formControlName="username" placeholder="ana_garcia" class="input-field" style="padding-left: 4px;">
+              </div>
             </div>
             <span class="field-error" *ngIf="form.get('username')?.hasError('pattern') && form.get('username')?.touched">
               Solo letras, números y guiones bajos
@@ -73,11 +71,11 @@
         </div>
       </div>
 
-      <!-- Step 2: Credenciales -->
+      <!-- Step 2: Credenciales, Foto y Experiencia -->
       <div *ngIf="step === 2">
         <div class="auth-header">
-          <h1>Acceso seguro</h1>
-          <p>Crea tus credenciales</p>
+          <h1>Acceso seguro y Perfil</h1>
+          <p>Completa tus datos de acceso</p>
         </div>
         <div class="auth-form">
           <div class="field-group">
@@ -90,6 +88,7 @@
               Email inválido
             </span>
           </div>
+          
           <div class="field-group">
             <label class="field-label">Contraseña</label>
             <div class="input-wrapper" [class.error]="form.get('password')?.invalid && form.get('password')?.touched">
@@ -103,6 +102,30 @@
               Mínimo 8 caracteres
             </span>
           </div>
+
+          <!-- NUEVO: Foto de perfil -->
+          <div class="field-group">
+            <label class="field-label">Foto de Perfil (Opcional)</label>
+            <div class="input-wrapper">
+              <mat-icon class="input-icon">image</mat-icon>
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" class="input-field" style="padding-top: 10px;">
+            </div>
+            <span *ngIf="imagenBase64" style="color: #28a745; font-size: 12px; margin-top: 4px; display: flex; align-items: center;">
+              <mat-icon style="font-size: 14px; width: 14px; height: 14px; margin-right: 4px;">check_circle</mat-icon> Imagen cargada
+            </span>
+          </div>
+
+          <!-- NUEVO: Experiencia breve -->
+          <div class="field-group">
+            <label class="field-label">Experiencia Breve (Opcional)</label>
+            <div class="input-wrapper" style="align-items: flex-start; padding-top: 8px;">
+              <mat-icon class="input-icon" style="margin-top: 4px;">description</mat-icon>
+              <textarea formControlName="experienciaBreve" placeholder="Cuéntanos un poco sobre ti en 100 caracteres..." class="input-field" rows="3" maxlength="100" style="resize: none;"></textarea>
+            </div>
+            <span style="font-size: 12px; color: #888; text-align: right; display: block; margin-top: 4px;">
+              {{ form.get('experienciaBreve')?.value?.length || 0 }} / 100
+            </span>
+          </div>
         </div>
       </div>
 
@@ -114,6 +137,7 @@
         </div>
 
         <div class="skills-section">
+          <!-- Lo que domina -->
           <div class="skills-block">
             <p class="section-label">¿Qué tecnologías dominas?</p>
             <p class="skills-hint">Selecciona las que puedes enseñar</p>
@@ -125,14 +149,15 @@
                 [class.selected-skill]="isHabilidadSelected(tech.id)"
                 [class.disabled-btn]="isInteresSelected(tech.id)"
                 [disabled]="isInteresSelected(tech.id)"
-                (click)="toggleHabilidad(tech.id)">
+                (click)="toggleHabilidad(tech)"> <!-- ¡OJO AQUÍ! Se pasa "tech" entero, no "tech.id" -->
                 {{ tech.nombre }}
                 <mat-icon *ngIf="isHabilidadSelected(tech.id)" class="check-icon">check</mat-icon>
               </button>
             </div>
           </div>
 
-          <div class="skills-block">
+          <!-- Lo que quiere aprender -->
+          <div class="skills-block" style="margin-top: 24px;">
             <p class="section-label">¿Qué quieres aprender?</p>
             <p class="skills-hint">Selecciona tus intereses</p>
             <div class="tech-grid">
@@ -150,6 +175,66 @@
             </div>
           </div>
         </div>
+
+        <!-- ========================================================= -->
+        <!-- NUEVO: DETALLES DE LAS TECNOLOGÍAS DOMINADAS (FORMARRAY)  -->
+        <!-- ========================================================= -->
+        <div *ngIf="tecnologiasDominaArray.length > 0" style="margin-top: 32px; border-top: 1px solid #eee; padding-top: 24px;">
+          <div class="auth-header" style="margin-bottom: 16px;">
+            <h2 style="font-size: 1.2rem;">Detalla tus conocimientos</h2>
+            <p style="font-size: 0.9rem;">Necesitamos saber tu nivel exacto</p>
+          </div>
+
+          <!-- Conexión con el FormArray -->
+          <div formArrayName="tecnologiasDomina" class="auth-form">
+            <div *ngFor="let techCtrl of tecnologiasDominaArray.controls; let i = index" 
+                 [formGroupName]="i" 
+                 style="background: rgba(0,0,0,0.02); padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e0e0e0;">
+              
+              <h3 style="margin-top: 0; color: #333; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                <mat-icon style="color: #007bff; font-size: 20px;">code</mat-icon>
+                {{ techCtrl.get('nombre')?.value }}
+              </h3>
+
+              <div class="field-row">
+                <!-- Nivel -->
+                <div class="field-group">
+                  <label class="field-label">Nivel <span style="color: red;">*</span></label>
+                  <div class="input-wrapper" [class.error]="techCtrl.get('nivel')?.invalid && techCtrl.get('nivel')?.touched">
+                    <select formControlName="nivel" class="input-field" style="width: 100%; border: none; background: transparent; outline: none; appearance: none;">
+                      <option value="" disabled selected>Selecciona nivel</option>
+                      <option value="Básico">Básico</option>
+                      <option value="Intermedio">Intermedio</option>
+                      <option value="Avanzado">Avanzado</option>
+                      <option value="Experto">Experto</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Años Experiencia -->
+                <div class="field-group">
+                  <label class="field-label">Años Exp. <span style="color: red;">*</span></label>
+                  <div class="input-wrapper" [class.error]="techCtrl.get('aniosExperiencia')?.invalid && techCtrl.get('aniosExperiencia')?.touched">
+                    <input type="number" formControlName="aniosExperiencia" min="0" placeholder="Ej: 2" class="input-field">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Puntos Fuertes -->
+              <div class="field-group" style="margin-top: 12px;">
+                <label class="field-label">Puntos fuertes <span style="color: red;">*</span></label>
+                <div class="input-wrapper" [class.error]="techCtrl.get('puntosFuertes')?.invalid && techCtrl.get('puntosFuertes')?.touched">
+                  <input type="text" formControlName="puntosFuertes" maxlength="30" placeholder="Ej: Seguridad, Arquitectura..." class="input-field">
+                </div>
+                <span style="font-size: 11px; color: #888; text-align: right; display: block; margin-top: 4px;">
+                  {{ techCtrl.get('puntosFuertes')?.value?.length || 0 }} / 30 max.
+                </span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Navigation -->
@@ -165,7 +250,9 @@
         <button type="button" class="btn-primary btn" *ngIf="step === 2" (click)="nextStep()" [disabled]="!step2Valid()">
           Continuar →
         </button>
-        <button type="submit" class="btn-primary btn submit-btn" *ngIf="step === 3" [class.loading]="loading" [disabled]="loading">
+        
+        <!-- El botón final ahora también comprueba que los detalles dinámicos sean válidos (form.invalid) -->
+        <button type="submit" class="btn-primary btn submit-btn" *ngIf="step === 3" [class.loading]="loading" [disabled]="loading || form.invalid">
           <span class="spinner" *ngIf="loading"></span>
           <span *ngIf="!loading">¡Empezar! 🚀</span>
           <span *ngIf="loading">Creando cuenta...</span>

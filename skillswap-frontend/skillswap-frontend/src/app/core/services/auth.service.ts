@@ -17,20 +17,16 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // ─── CORRECCIÓN 1: URL cambiada de /auth/login → /auth/signin ─────
+  // ─── LOGIN ─────
   login(request: AuthRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/signin`, request).pipe(
       tap(response => this.handleAuth(response))
     );
   }
 
-  // ─── CORRECCIÓN 2: URL cambiada de /auth/register → /auth/signup ──
-  // El backend devuelve un String, no un JWT, así que solo retornamos
-  // el observable crudo. El componente redirige a /login tras el éxito.
+  // ─── REGISTRO (Corregida la URL y el tipo de respuesta) ──
   register(request: RegisterRequest): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/auth/signup`, request, {
-      responseType: 'text'
-    });
+    return this.http.post(`${environment.apiUrl}/auth/register`, request);
   }
 
   logout(): void {
@@ -60,8 +56,6 @@ export class AuthService {
     this.currentUser.set(user);
   }
 
-  // ─── CORRECCIÓN 3: El backend devuelve { token, id, username, email }
-  // (sin objeto "user" anidado). Construimos el UserProfile manualmente.
   private handleAuth(response: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, response.token);
 

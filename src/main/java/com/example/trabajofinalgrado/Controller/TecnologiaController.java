@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tecnologias")
-@CrossOrigin(origins = "http://localhost:4200") // ¡Importante para que Angular no de error!
+@CrossOrigin(origins = "http://localhost:4200") 
 public class TecnologiaController {
     @Autowired
     private TecnologiaService tecnologiaService;

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 @Entity
@@ -40,4 +42,14 @@ public class User {
     @ManyToMany
     @JoinTable(name = "user_aprende")
     private Set<Tecnologia> tecnologiasAprende = new HashSet<>();
+    @Column(length = 100)
+    private String experienciaBreve;
+
+    // 2. Nueva imagen de perfil en Base64
+    @Column(columnDefinition = "LONGTEXT")
+    private String imagenPerfil;
+
+    // 3. LA NUEVA RELACIÓN (Borra tu antiguo @ManyToMany de tecnologias domina)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioTecnologia> tecnologiasDominaDetalle = new ArrayList<>();
 }

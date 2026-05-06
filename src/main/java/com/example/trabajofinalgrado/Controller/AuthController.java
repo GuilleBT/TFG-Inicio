@@ -4,11 +4,13 @@ import com.example.trabajofinalgrado.Model.ERole;
 import com.example.trabajofinalgrado.Model.Role;
 import com.example.trabajofinalgrado.Model.User;
 import com.example.trabajofinalgrado.Model.Tecnologia;
+import com.example.trabajofinalgrado.Model.UsuarioTecnologia; // Entidad nueva
 import com.example.trabajofinalgrado.Repository.RoleRepository;
 import com.example.trabajofinalgrado.Repository.UserRepository;
 import com.example.trabajofinalgrado.Repository.TecnologiaRepository;
 import com.example.trabajofinalgrado.DTOs.Request.LoginRequest;
 import com.example.trabajofinalgrado.DTOs.Request.SignupRequest;
+import com.example.trabajofinalgrado.DTOs.Request.TecnologiaDetalleRequest; // Molde nuevo
 import com.example.trabajofinalgrado.DTOs.Response.JwtResponse;
 import com.example.trabajofinalgrado.Security.JWT.JwtUtils;
 import com.example.trabajofinalgrado.Security.Service.UserDetailsImpl;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -40,7 +43,7 @@ public class AuthController {
     RoleRepository roleRepository;
 
     @Autowired
-    TecnologiaRepository tecnologiaRepository; // ¡Añadido para buscar las tecnologías!
+    TecnologiaRepository tecnologiaRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -48,7 +51,7 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
-    @PostMapping("/signin")
+    @PostMapping("/signin") // Si en Angular usas /login, recuerda cambiar esto a /login
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -64,7 +67,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/register") // Ajustado a la ruta correcta de Angular
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest().body("Error: Username is already taken!");
@@ -81,6 +84,10 @@ public class AuthController {
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
         user.setNombre(signUpRequest.getNombre());
         user.setApellido(signUpRequest.getApellido());
+        
+        // --- LOS NUEVOS CAMPOS ---
+        user.setExperienciaBreve(signUpRequest.getExperienciaBreve());
+        user.setImagenPerfil(signUpRequest.getImagenPerfil());
 
         // 2. Asignar rol por defecto (ROLE_USER)
         Set<Role> roles = new HashSet<>();
@@ -89,13 +96,25 @@ public class AuthController {
         roles.add(userRole);
         user.setRoles(roles);
 
-        // 3. Asignar tecnologías que DOMINA
-        if (signUpRequest.getTecnologiasDominaIds() != null && !signUpRequest.getTecnologiasDominaIds().isEmpty()) {
-            List<Tecnologia> dominaList = tecnologiaRepository.findAllById(signUpRequest.getTecnologiasDominaIds());
-            user.setTecnologiasDomina(new HashSet<>(dominaList));
+        // 3. LA NUEVA LÓGICA: Asignar tecnologías que DOMINA con todos sus detalles
+        if (signUpRequest.getTecnologiasDomina() != null) {
+            for (TecnologiaDetalleRequest techRequest : signUpRequest.getTecnologiasDomina()) {
+                
+                Tecnologia tecnologia = tecnologiaRepository.findById(techRequest.getTecnologiaId())
+                        .orElseThrow(() -> new RuntimeException("Error: Tecnología no encontrada."));
+
+                UsuarioTecnologia usuarioTecnologia = new UsuarioTecnologia();
+                usuarioTecnologia.setUsuario(user);
+                usuarioTecnologia.setTecnologia(tecnologia);
+                usuarioTecnologia.setNivel(techRequest.getNivel());
+                usuarioTecnologia.setAniosExperiencia(techRequest.getAniosExperiencia());
+                usuarioTecnologia.setPuntosFuertes(techRequest.getPuntosFuertes());
+
+                user.getTecnologiasDominaDetalle().add(usuarioTecnologia);
+            }
         }
 
-        // 4. Asignar tecnologías que APRENDE
+        // 4. Asignar tecnologías que APRENDE (Esto se queda igual, como una lista simple)
         if (signUpRequest.getTecnologiasAprendeIds() != null && !signUpRequest.getTecnologiasAprendeIds().isEmpty()) {
             List<Tecnologia> aprendeList = tecnologiaRepository.findAllById(signUpRequest.getTecnologiasAprendeIds());
             user.setTecnologiasAprende(new HashSet<>(aprendeList));
@@ -104,6 +123,7 @@ public class AuthController {
         // 5. Guardar el usuario completo en BD
         userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully!");
+        // Devolvemos el mensaje envuelto en un Map para que Angular lo lea como JSON perfecto
+        return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
 }
