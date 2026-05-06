@@ -8,19 +8,32 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const token = authService.getToken();
+  if (req.url.includes('/api/auth/')) {
+    return next(req);
+  }
 
-  const authReq = token
-    ? req.clone({
-        setHeaders: { Authorization: `Bearer ${token}` }
-      })
+  let rawData = authService.getToken() || sessionStorage.getItem('auth-user') || '';
+  let finalToken = '';
+
+  if (rawData) {
+    try {
+      const parsed = JSON.parse(rawData);
+      finalToken = parsed.token || parsed.accessToken || '';
+    } catch (e) {
+      finalToken = rawData.replace(/^"(.*)"$/, '$1');
+    }
+  }
+
+  const authReq = finalToken
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${finalToken}` } })
     : req;
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
+
       if (error.status === 401) {
         authService.logout();
-        router.navigate(['/login'], { queryParams: { expired: true } });
+        router.navigate(['/login']);
       }
       return throwError(() => error);
     })
