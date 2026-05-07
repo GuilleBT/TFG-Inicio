@@ -14,14 +14,46 @@
   <div class="form-card" *ngIf="showForm">
     <h2>Nueva sesión de mentoring</h2>
     <form [formGroup]="createForm" (ngSubmit)="onCreateSubmit()" class="session-form">
+
       <div class="field-row">
+        <!-- Buscador de receptor -->
         <div class="field-group">
-          <label class="field-label">ID del receptor *</label>
-          <div class="input-wrapper">
-            <input type="number" formControlName="receptorId" class="input-field" placeholder="ID del usuario">
+          <label class="field-label">Con quién *</label>
+          <div *ngIf="!selectedReceptor">
+            <div class="input-wrapper">
+              <mat-icon class="input-icon">search</mat-icon>
+              <input
+                type="text"
+                class="input-field"
+                placeholder="Busca por nombre o username..."
+                [(ngModel)]="userSearchQuery"
+                [ngModelOptions]="{standalone: true}"
+                (input)="onUserSearch()"
+              >
+            </div>
+            <div class="search-results" *ngIf="userSearchResults.length > 0">
+              <button
+                type="button"
+                class="search-result-item"
+                *ngFor="let u of userSearchResults"
+                (click)="selectReceptor(u)">
+                <span class="result-avatar">{{ u.nombre[0] }}{{ u.apellido[0] }}</span>
+                <span class="result-name">{{ u.nombre }} {{ u.apellido }}</span>
+                <span class="result-username font-mono">&#64;{{ u.username }}</span>
+              </button>
+            </div>
           </div>
-          <span class="field-hint" *ngIf="receptorNombreParam">Con: {{ receptorNombreParam }}</span>
+          <div class="selected-user" *ngIf="selectedReceptor">
+            <mat-icon>check_circle</mat-icon>
+            <span>{{ selectedReceptor.nombre }} {{ selectedReceptor.apellido }}
+              <span class="font-mono">&#64;{{ selectedReceptor.username }}</span>
+            </span>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="clearReceptor()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
         </div>
+
         <div class="field-group">
           <label class="field-label">Tecnología</label>
           <select formControlName="tecnologiaId" class="select-field">
@@ -30,6 +62,7 @@
           </select>
         </div>
       </div>
+
       <div class="field-group">
         <label class="field-label">Título *</label>
         <div class="input-wrapper">
@@ -74,7 +107,7 @@
         </div>
       </div>
       <div class="form-footer">
-        <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving">
+        <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving || !selectedReceptor">
           <span class="spinner" *ngIf="saving"></span>
           <mat-icon *ngIf="!saving">send</mat-icon>
           {{ saving ? 'Enviando...' : 'Crear sesión' }}

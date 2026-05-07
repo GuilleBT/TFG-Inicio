@@ -12,6 +12,7 @@ export interface Review {
     nombre: string;
   };
   creadoEn: string;
+  receptorNombre?: string;
 }
 
 export interface CreateReviewRequest {
