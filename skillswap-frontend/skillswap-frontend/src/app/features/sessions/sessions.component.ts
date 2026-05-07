@@ -4,11 +4,13 @@ import { ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
 import { TecnologiaService } from '../../core/services/tecnologia.service';
+import { UserService } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Session } from '../../core/models/session.model';
-import { Tecnologia } from '../../core/models/user.model';
+import { Tecnologia, UserProfile } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-sessions',
@@ -24,12 +26,17 @@ export class SessionsComponent implements OnInit {
   showForm = false;
   saving = false;
   filterEstado = 'TODAS';
-  receptorNombreParam = '';
   createForm: FormGroup;
+
+  userSearchQuery = '';
+  userSearchResults: UserProfile[] = [];
+  selectedReceptor: UserProfile | null = null;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private sessionService: SessionService,
     private tecnologiaService: TecnologiaService,
+    private userService: UserService,
     public authService: AuthService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
@@ -49,13 +56,32 @@ export class SessionsComponent implements OnInit {
 
   ngOnInit(): void {
     this.tecnologiaService.getAll().subscribe({ next: t => this.tecnologias = t, error: () => {} });
+
+    this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe(q => {
+      if (q.trim().length < 2) { this.userSearchResults = []; return; }
+      this.userService.searchUsers(q).subscribe({
+        next: results => this.userSearchResults = results.filter(u => u.id !== this.authService.currentUser()?.id),
+        error: () => {}
+      });
+    });
+
     this.route.queryParams.subscribe(params => {
       if (params['receptorId']) {
-        this.createForm.patchValue({ receptorId: +params['receptorId'] });
-        this.receptorNombreParam = params['receptorNombre'] || '';
+        const receptorId = +params['receptorId'];
+        this.createForm.patchValue({ receptorId });
         this.showForm = true;
+        this.userService.getUserById(receptorId).subscribe({
+          next: u => { this.selectedReceptor = u; },
+          error: () => {
+            const nombre = params['receptorNombre'] || '';
+            if (nombre) {
+              this.selectedReceptor = { id: receptorId, nombre: nombre.split(' ')[0], apellido: nombre.split(' ')[1] ?? '', email: '', username: '', habilidades: [], intereses: [] };
+            }
+          }
+        });
       }
     });
+
     this.loadSessions();
   }
 
@@ -67,33 +93,47 @@ export class SessionsComponent implements OnInit {
     });
   }
 
+  onUserSearch(): void {
+    this.searchSubject.next(this.userSearchQuery);
+  }
+
+  selectReceptor(u: UserProfile): void {
+    this.selectedReceptor = u;
+    this.createForm.patchValue({ receptorId: u.id });
+    this.userSearchResults = [];
+    this.userSearchQuery = '';
+  }
+
+  clearReceptor(): void {
+    this.selectedReceptor = null;
+    this.createForm.patchValue({ receptorId: '' });
+  }
+
   get filteredSessions(): Session[] {
     if (this.filterEstado === 'TODAS') return this.sessions;
     return this.sessions.filter(s => s.estado === this.filterEstado);
   }
 
   onCreateSubmit(): void {
-    if (this.createForm.invalid || this.saving) return;
+    if (this.createForm.invalid || this.saving || !this.selectedReceptor) return;
     this.saving = true;
     const v = this.createForm.value;
-    
-    // Forzamos el tipo 'any' para evitar conflictos estrictos con la interfaz CreateSessionRequest
     const request: any = {
       receptorId: +v.receptorId,
       titulo: v.titulo,
       descripcion: v.descripcion,
-      fechaHora: new Date(v.fechaHora).toISOString().replace('Z',''),
+      fechaHora: new Date(v.fechaHora).toISOString().replace('Z', ''),
       duracionMinutos: +v.duracionMinutos,
       enlaceMeeting: v.enlaceMeeting || undefined,
       enlaceGithub: v.enlaceGithub || undefined,
       tecnologiaId: v.tecnologiaId ? +v.tecnologiaId : undefined
     };
-    
     this.sessionService.createSession(request).subscribe({
       next: s => {
         this.sessions = [s, ...this.sessions];
         this.showForm = false;
         this.saving = false;
+        this.selectedReceptor = null;
         this.createForm.reset({ duracionMinutos: 60 });
         this.snackBar.open('Sesión creada ✓', '', { duration: 3000 });
       },

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -28,23 +29,7 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("id", user.getId());
-        userData.put("nombre", user.getNombre());
-        userData.put("apellido", user.getApellido());
-        userData.put("email", user.getEmail());
-        userData.put("username", user.getUsername());
-        userData.put("experiencia_breve", user.getExperienciaBreve());
-        userData.put("imagen_perfil", user.getImagenPerfil());
-        userData.put("tecnologias_domina", user.getTecnologiasDomina().stream()
-                .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(), "iconoUrl", t.getIconoUrl() != null ? t.getIconoUrl() : ""))
-                .collect(Collectors.toList()));
-        userData.put("tecnologias_aprende", user.getTecnologiasAprende().stream()
-                .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(), "iconoUrl", t.getIconoUrl() != null ? t.getIconoUrl() : ""))
-                .collect(Collectors.toList()));
-
-        return ResponseEntity.ok(userData);
+        return ResponseEntity.ok(toMap(user, true));
     }
 
     @GetMapping("/{id}")
@@ -52,21 +37,41 @@ public class UserController {
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return ResponseEntity.ok(toMap(user, false));
+    }
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("id", user.getId());
-        userData.put("nombre", user.getNombre());
-        userData.put("apellido", user.getApellido());
-        userData.put("username", user.getUsername());
-        userData.put("experiencia_breve", user.getExperienciaBreve());
-        userData.put("imagen_perfil", user.getImagenPerfil());
-        userData.put("tecnologias_domina", user.getTecnologiasDomina().stream()
-                .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(), "iconoUrl", t.getIconoUrl() != null ? t.getIconoUrl() : ""))
-                .collect(Collectors.toList()));
-        userData.put("tecnologias_aprende", user.getTecnologiasAprende().stream()
-                .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(), "iconoUrl", t.getIconoUrl() != null ? t.getIconoUrl() : ""))
-                .collect(Collectors.toList()));
+    @GetMapping("/search")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<Map<String, Object>>> searchUsers(@RequestParam String q) {
+        String query = q.toLowerCase().trim();
+        List<Map<String, Object>> results = userRepository.findAll().stream()
+                .filter(u -> u.getNombre().toLowerCase().contains(query)
+                        || u.getApellido().toLowerCase().contains(query)
+                        || u.getUsername().toLowerCase().contains(query)
+                        || u.getEmail().toLowerCase().contains(query))
+                .limit(10)
+                .map(u -> toMap(u, false))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(results);
+    }
 
-        return ResponseEntity.ok(userData);
+    private Map<String, Object> toMap(User user, boolean includeEmail) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", user.getId());
+        data.put("nombre", user.getNombre());
+        data.put("apellido", user.getApellido());
+        data.put("username", user.getUsername());
+        data.put("experiencia_breve", user.getExperienciaBreve());
+        data.put("imagen_perfil", user.getImagenPerfil());
+        data.put("tecnologias_domina", user.getTecnologiasDomina().stream()
+                .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(),
+                        "iconoUrl", t.getIconoUrl() != null ? t.getIconoUrl() : ""))
+                .collect(Collectors.toList()));
+        data.put("tecnologias_aprende", user.getTecnologiasAprende().stream()
+                .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(),
+                        "iconoUrl", t.getIconoUrl() != null ? t.getIconoUrl() : ""))
+                .collect(Collectors.toList()));
+        if (includeEmail) data.put("email", user.getEmail());
+        return data;
     }
 }

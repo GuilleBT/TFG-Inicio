@@ -14,18 +14,40 @@
   <div class="form-card" *ngIf="showForm">
     <h2>Escribe una reseña</h2>
     <form [formGroup]="createForm" (ngSubmit)="onSubmit()" class="review-form">
-      <div class="field-row">
-        <div class="field-group">
-          <label class="field-label">ID del usuario valorado *</label>
-          <div class="input-wrapper">
-            <input type="number" formControlName="receptorId" class="input-field" placeholder="ID del usuario">
-          </div>
+
+      <!-- Buscador de usuario -->
+      <div class="field-group">
+        <label class="field-label">¿A quién quieres valorar? *</label>
+        <div class="input-wrapper">
+          <mat-icon class="input-icon">search</mat-icon>
+          <input
+            type="text"
+            class="input-field"
+            placeholder="Busca por nombre o username..."
+            [(ngModel)]="userSearchQuery"
+            [ngModelOptions]="{standalone: true}"
+            (input)="onUserSearch()"
+          >
         </div>
-        <div class="field-group">
-          <label class="field-label">ID de la sesión (opcional)</label>
-          <div class="input-wrapper">
-            <input type="number" formControlName="sesionId" class="input-field" placeholder="ID de la sesión">
-          </div>
+        <!-- Resultados de búsqueda -->
+        <div class="search-results" *ngIf="userSearchResults.length > 0">
+          <button
+            type="button"
+            class="search-result-item"
+            *ngFor="let u of userSearchResults"
+            (click)="selectUser(u)">
+            <span class="result-avatar">{{ u.nombre[0] }}{{ u.apellido[0] }}</span>
+            <span class="result-name">{{ u.nombre }} {{ u.apellido }}</span>
+            <span class="result-username font-mono">&#64;{{ u.username }}</span>
+          </button>
+        </div>
+        <!-- Usuario seleccionado -->
+        <div class="selected-user" *ngIf="selectedUser">
+          <mat-icon>check_circle</mat-icon>
+          <span>{{ selectedUser.nombre }} {{ selectedUser.apellido }} <span class="font-mono">&#64;{{ selectedUser.username }}</span></span>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="clearSelectedUser()">
+            <mat-icon>close</mat-icon>
+          </button>
         </div>
       </div>
 
@@ -54,7 +76,7 @@
       </div>
 
       <div class="form-footer">
-        <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving">
+        <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving || !selectedUser">
           <span class="spinner" *ngIf="saving"></span>
           <mat-icon *ngIf="!saving">star</mat-icon>
           {{ saving ? 'Publicando...' : 'Publicar reseña' }}
@@ -82,7 +104,7 @@
         <div class="review-avatar">{{ r.autorNombre?.[0] ?? '?' }}</div>
         <div class="review-meta">
           <span class="review-author">{{ r.autorNombre }}</span>
-          <span class="review-receptor">→ {{ r.receptorId }}</span>
+          <span class="review-receptor">→ {{ r.receptorNombre ?? 'Usuario #' + r.receptorId }}</span>
           <app-star-rating [rating]="r.puntuacion"></app-star-rating>
         </div>
         <span class="review-date font-mono">{{ r.creadoEn | date:'dd/MM/yy' }}</span>
@@ -94,7 +116,6 @@
         </button>
       </div>
       <p class="review-comment">{{ r.comentario }}</p>
-      <span class="tech-chip" *ngIf="r.tecnologia">{{ r.tecnologia.nombre }}</span>
     </div>
   </div>
 </div>

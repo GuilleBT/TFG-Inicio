@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ReviewService } from '../../core/services/review.service';
+import { UserService } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
 import { StarRatingComponent } from '../../shared/components/star-rating/star-rating.component';
 import { Review } from '../../core/models/review.model';
+import { UserProfile } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-reviews',
@@ -23,8 +26,14 @@ export class ReviewsComponent implements OnInit {
   selectedRating = 0;
   createForm: FormGroup;
 
+  userSearchQuery = '';
+  userSearchResults: UserProfile[] = [];
+  selectedUser: UserProfile | null = null;
+  private searchSubject = new Subject<string>();
+
   constructor(
     private reviewService: ReviewService,
+    private userService: UserService,
     public authService: AuthService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
@@ -37,7 +46,16 @@ export class ReviewsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void { this.loadReviews(); }
+  ngOnInit(): void {
+    this.loadReviews();
+    this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe(q => {
+      if (q.trim().length < 2) { this.userSearchResults = []; return; }
+      this.userService.searchUsers(q).subscribe({
+        next: results => this.userSearchResults = results.filter(u => u.id !== this.authService.currentUser()?.id),
+        error: () => {}
+      });
+    });
+  }
 
   loadReviews(): void {
     this.loading = true;
@@ -47,13 +65,29 @@ export class ReviewsComponent implements OnInit {
     });
   }
 
+  onUserSearch(): void {
+    this.searchSubject.next(this.userSearchQuery);
+  }
+
+  selectUser(u: UserProfile): void {
+    this.selectedUser = u;
+    this.createForm.patchValue({ receptorId: u.id });
+    this.userSearchResults = [];
+    this.userSearchQuery = '';
+  }
+
+  clearSelectedUser(): void {
+    this.selectedUser = null;
+    this.createForm.patchValue({ receptorId: '' });
+  }
+
   onRatingChange(val: number): void {
     this.selectedRating = val;
     this.createForm.patchValue({ puntuacion: val });
   }
 
   onSubmit(): void {
-    if (this.createForm.invalid || this.saving) return;
+    if (this.createForm.invalid || this.saving || !this.selectedUser) return;
     this.saving = true;
     const v = this.createForm.value;
     const request = {
@@ -68,6 +102,7 @@ export class ReviewsComponent implements OnInit {
         this.showForm = false;
         this.saving = false;
         this.selectedRating = 0;
+        this.selectedUser = null;
         this.createForm.reset();
         this.snackBar.open('Reseña publicada ✓', '', { duration: 3000 });
       },

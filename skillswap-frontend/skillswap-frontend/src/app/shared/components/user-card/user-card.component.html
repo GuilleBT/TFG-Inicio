@@ -2,8 +2,8 @@
 
   <!-- Match score badge -->
   <div class="match-score" *ngIf="match && showMatchScore">
-    <span class="score-value">{{ match.puntuacionMatch }}%</span>
-    <span class="score-label">match</span>
+    <span class="score-value">{{ match.puntuacionMatch }}</span>
+    <span class="score-label">coincidencias</span>
   </div>
 
   <!-- Header -->
@@ -16,7 +16,8 @@
       <a [routerLink]="['/profile', displayUser.id]" class="user-name">
         {{ displayUser.nombre }} {{ displayUser.apellido }}
       </a>
-  <span class="username font-mono">&#64;{{ displayUser.username }}</span>      <div class="user-meta" *ngIf="displayUser.ubicacion || displayUser.valoracionMedia">
+      <span class="username font-mono">&#64;{{ displayUser.username }}</span>
+      <div class="user-meta" *ngIf="displayUser.ubicacion || displayUser.valoracionMedia">
         <span *ngIf="displayUser.ubicacion" class="location">
           <mat-icon class="meta-icon">place</mat-icon>
           {{ displayUser.ubicacion }}
