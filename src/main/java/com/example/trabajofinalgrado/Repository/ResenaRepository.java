@@ -1,0 +1,16 @@
+package com.example.trabajofinalgrado.Repository;
+
+import com.example.trabajofinalgrado.Model.Resena;
+import com.example.trabajofinalgrado.Model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ResenaRepository extends JpaRepository<Resena, Long> {
+
+    List<Resena> findByAutorOrderByCreadoEnDesc(User autor);
+
+    List<Resena> findByReceptorOrderByCreadoEnDesc(User receptor);
+}
