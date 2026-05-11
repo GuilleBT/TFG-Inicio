@@ -1,5 +1,7 @@
 .home {
   min-height: 100vh;
+  background: #0f0f0f; // Color de fondo del nuevo SCSS
+  color: white; // Color de texto base
 }
 
 /* ─── Hero ─── */
@@ -9,14 +11,39 @@
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding: 80px 0 64px;
+  padding: 80px 0 64px; // padding del SCSS original
 
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(ellipse 60% 60% at 50% 0%, rgba(94, 234, 212, 0.07) 0%, transparent 70%);
+    // Gradiente del SCSS original
+    background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(94, 234, 212, 0.07) 0%, transparent 70%);
+  }
+
+  // Estilos del nuevo SCSS para el hero
+  padding: 100px 0;
+
+  .hero-title {
+    font-size: clamp(40px, 7vw, 72px); // Clamp del SCSS original
+    font-weight: 800;
+    line-height: 1.2; // Línea del nuevo SCSS
+  }
+  .title-accent {
+    color: var(--accent, #00d1b2); // Usa --accent si está definido, sino el del nuevo SCSS
+    position: relative; // Del SCSS original
+
+    &::after { // Del SCSS original
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent, #00d1b2);
+      opacity: 0.4;
+      border-radius: 1px;
+    }
   }
 }
 
@@ -46,34 +73,6 @@
     border-radius: 50%;
     background: var(--accent);
     animation: pulseGlow 2s ease-in-out infinite;
-  }
-}
-
-.hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(40px, 7vw, 72px);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin-bottom: 24px;
-  animation: fadeInUp 0.5s 0.1s ease both;
-}
-
-.title-accent {
-  color: var(--accent);
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--accent);
-    opacity: 0.4;
-    border-radius: 1px;
   }
 }
 
@@ -136,11 +135,15 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-/* ─── Stats ─── */
+/* ─── Stats (Original) ─── */
 .stats-section {
   padding: 32px 0;
   border-top: 1px solid var(--border-subtle);
@@ -174,7 +177,7 @@
   text-align: center;
 }
 
-/* ─── How it works ─── */
+/* ─── How it works (Original) ─── */
 .how-section {
   padding: 96px 0;
 }
@@ -234,17 +237,134 @@
   }
 }
 
-/* ─── Features ─── */
-.features-section {
-  padding: 96px 0;
-  background: linear-gradient(to bottom, transparent, var(--bg-surface), transparent);
+/* ─── Ranking Section (Nuevo) ─── */
+.ranking-section {
+  padding: 80px 0;
+  background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
+
+  .podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 20px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+  }
+
+  .podium-item {
+    flex: 1;
+    max-width: 300px;
+    min-width: 250px;
+    margin-bottom: 20px;
+    text-align: center; // Añadido para centrar contenido
+
+    &.first-place {
+      transform: translateY(-20px);
+      .podium-card {
+        border-color: #ffd700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+      }
+      .rank-badge {
+        background: #ffd700;
+        color: #000;
+      }
+    }
+  }
+
+  .podium-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    display: flex; // Para organizar contenido internamente
+    flex-direction: column;
+    align-items: center;
+    height: 100%; // Asegura que las tarjetas tengan la misma altura si los contenedores son flex
+
+    .user-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 3px solid #333;
+      object-fit: cover; // Asegura que la imagen se vea bien
+    }
+
+    .rank-badge {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #333;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white; // Asegurar color de texto
+      font-size: 0.8rem;
+    }
+
+    h3 { // Estilos para el nombre de usuario
+      font-size: 1.3rem;
+      margin-bottom: 5px;
+      color: white;
+    }
+
+    .username {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 15px;
+    }
+
+    .stat-box {
+      margin-top: 15px;
+      text-align: center;
+      .stat-num {
+        display: block;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #00d1b2;
+      }
+      .stat-label {
+        font-size: 0.7rem;
+        color: #777;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+    }
+  }
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-  margin-top: 48px;
+.empty-ranking {
+  padding: 40px;
+  border: 2px dashed #333;
+  border-radius: 20px;
+  color: #777;
+  margin-top: 40px;
+}
+
+
+/* ─── Features ─── */
+.features-section {
+  padding: 96px 0; // Padding del SCSS original
+  background: linear-gradient(to bottom, transparent, var(--bg-surface), transparent); // Del SCSS original
+
+  // Estilos del nuevo SCSS para las características
+  padding: 80px 0;
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); // Del SCSS original
+    gap: 24px; // Del SCSS original
+    margin-top: 48px; // Del SCSS original
+
+    // Gap y margin-top del nuevo SCSS
+    gap: 30px;
+    margin-top: 40px;
+  }
 }
 
 .feature-card {
@@ -325,3 +445,49 @@
     font-weight: 600;
   }
 }
+
+/* Section labels y títulos (comunes a ambos códigos) */
+.section-label {
+  color: var(--accent, #00d1b2); // Usa --accent si está definido, sino el del nuevo SCSS
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px; // Añadido para espaciado
+  display: block; // Asegura que ocupa su propia línea
+  text-align: center; // Centrar el label
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 44px); // Ajustado para ser responsivo
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-primary); // o 'white' si no tienes variables CSS
+  margin-bottom: 40px; // Aumentado para más espacio
+  text-align: center; // Centrar el título
+}
+
+// Keyframes del SCSS original
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(94, 234, 212, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(94, 234, 212, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(94, 234, 212, 0);
+  }
+}
+

@@ -1,8 +1,6 @@
 <div class="home">
-
-  <!-- Hero -->
   <section class="hero">
-    <div class="container hero-inner">
+    <div class="container hero-inner text-center">
       <div class="hero-badge">
         <span class="badge-dot"></span>
         Red de trueque de conocimiento técnico
@@ -30,7 +28,6 @@
         </a>
       </div>
 
-      <!-- Floating tech badges -->
       <div class="tech-float" aria-hidden="true">
         <span class="tech-badge" style="--delay: 0s; --x: 10%; --y: 20%">Java</span>
         <span class="tech-badge" style="--delay: 0.5s; --x: 80%; --y: 10%">Angular</span>
@@ -43,7 +40,6 @@
     </div>
   </section>
 
-  <!-- Stats -->
   <section class="stats-section">
     <div class="container">
       <div class="stats-grid">
@@ -55,7 +51,6 @@
     </div>
   </section>
 
-  <!-- How it works -->
   <section class="how-section">
     <div class="container">
       <p class="section-label">Cómo funciona</p>
@@ -71,6 +66,7 @@
         <div class="step-connector"></div>
         <div class="step">
           <div class="step-number">02</div>
+          <div class="step-number">02</div>
           <div class="step-content">
             <h3>Encuentra tu match</h3>
             <p>El sistema te sugiere personas cuyas habilidades complementan perfectamente las tuyas. Intercambio recíproco garantizado.</p>
@@ -78,6 +74,7 @@
         </div>
         <div class="step-connector"></div>
         <div class="step">
+          <div class="step-number">03</div>
           <div class="step-number">03</div>
           <div class="step-content">
             <h3>Aprende y enseña</h3>
@@ -88,11 +85,80 @@
     </div>
   </section>
 
-  <!-- Features -->
+  <section class="ranking-section">
+    <div class="container text-center">
+      <p class="section-label">Reconocimiento</p>
+      <h2 class="section-title text-white">Top Mentores</h2>
+
+      <div class="podium-container" *ngIf="usuariosRanking && usuariosRanking.length > 0">
+        <ng-container *ngIf="usuariosRanking[1]">
+          <div class="podium-item" [style.order]="1">
+            <div class="podium-card">
+              <div class="rank-badge">#2</div>
+              <div class="avatar-container">
+                <img [src]="usuariosRanking[1].avatarUrl || 'https://ui-avatars.com/api/?name=' + usuariosRanking[1].nombre" 
+                     class="user-avatar" 
+                     [alt]="usuariosRanking[1].nombre">
+              </div>
+              <h3>{{ usuariosRanking[1].nombre }}</h3>
+              <span class="username">usuario: {{ usuariosRanking[1].username }}</span>
+              <div class="stat-box">
+                <span class="stat-num">{{ user.sesionesCompletadas != null ? user.sesionesCompletadas : 0 }}</span>
+                <span class="stat-label">SESIONES REALIZADAS</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="usuariosRanking[0]">
+          <div class="podium-item first-place" [style.order]="2">
+            <div class="podium-card">
+              <div class="rank-badge">#1</div>
+              <div class="avatar-container">
+                <img [src]="usuariosRanking[0].avatarUrl || 'https://ui-avatars.com/api/?name=' + usuariosRanking[0].nombre" 
+                     class="user-avatar" 
+                     [alt]="usuariosRanking[0].nombre">
+              </div>
+              <h3>{{ usuariosRanking[0].nombre }}</h3>
+              <span class="username">usuario: {{ usuariosRanking[0].username }}</span>
+              <div class="stat-box">
+                <span class="stat-num">{{ user.sesionesCompletadas != null ? user.sesionesCompletadas : 0 }}</span>
+                <span class="stat-label">SESIONES REALIZADAS</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="usuariosRanking[2]">
+          <div class="podium-item" [style.order]="3">
+            <div class="podium-card">
+              <div class="rank-badge">#3</div>
+              <div class="avatar-container">
+                <img [src]="usuariosRanking[2].avatarUrl || 'https://ui-avatars.com/api/?name=' + usuariosRanking[2].nombre" 
+                     class="user-avatar" 
+                     [alt]="usuariosRanking[2].nombre">
+              </div>
+              <h3>{{ usuariosRanking[2].nombre }}</h3>
+              <span class="username">usuario: {{ usuariosRanking[2].username }}</span>
+              <div class="stat-box">
+                <span class="stat-num">{{ user.sesionesCompletadas != null ? user.sesionesCompletadas : 0 }}</span>
+                <span class="stat-label">SESIONES REALIZADAS</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div *ngIf="!usuariosRanking || usuariosRanking.length === 0" class="empty-ranking">
+        <p class="text-muted">Todavía no hay mentores con sesiones completadas esta semana.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="features-section">
     <div class="container">
-      <p class="section-label">Características</p>
-      <h2 class="section-title">Todo lo que necesitas</h2>
+      <p class="section-label text-center">Características</p>
+      <h2 class="section-title text-center text-white">Todo lo que necesitas</h2>
       <div class="features-grid">
         <div class="feature-card" *ngFor="let f of features; let i = index" [style.--delay]="i * 0.1 + 's'">
           <span class="feature-icon">{{ f.icon }}</span>
@@ -103,7 +169,6 @@
     </div>
   </section>
 
-  <!-- CTA final -->
   <section class="cta-section">
     <div class="container">
       <div class="cta-card">
@@ -115,5 +180,4 @@
       </div>
     </div>
   </section>
-
 </div>
