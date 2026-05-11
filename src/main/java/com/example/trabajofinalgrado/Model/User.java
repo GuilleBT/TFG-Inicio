@@ -48,8 +48,18 @@ public class User {
     // 2. Nueva imagen de perfil en Base64
     @Column(columnDefinition = "LONGTEXT")
     private String imagenPerfil;
+    
+     @Column(length = 500)
+    private String bio;
+
+    private String ubicacion;
+
+    private String github;
+
+    private String linkedin;
 
     // 3. LA NUEVA RELACIÓN (Borra tu antiguo @ManyToMany de tecnologias domina)
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsuarioTecnologia> tecnologiasDominaDetalle = new ArrayList<>();
+   
 }

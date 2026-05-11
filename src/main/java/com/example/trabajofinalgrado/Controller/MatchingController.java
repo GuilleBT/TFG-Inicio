@@ -28,6 +28,19 @@ public class MatchingController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<MatchResponseDTO>> getMatches() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // 1. Comprobamos si el que entra es un INVITADO (sin sesión)
+        boolean isGuest = (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal()));
+
+        if (isGuest) {
+            // MODO ESCAPARATE: Devolvemos a todos los usuarios sin calcular el "match"
+            List<MatchResponseDTO> allUsers = userRepository.findAll().stream()
+                    .map(this::buildGuestMatchDTO)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(allUsers);
+        }
+
+        // 2. MODO USUARIO REGISTRADO: Tu lógica de matching inteligente original
         User currentUser = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 

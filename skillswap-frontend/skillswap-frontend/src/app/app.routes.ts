@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, publicGuard } from './core/guards/auth.guard';
-
+import { MatchingComponent } from './features/matching/matching.component';
 export const routes: Routes = [
   {
     path: '',
@@ -17,10 +17,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent),
     canActivate: [publicGuard]
   },
-  {
+ {
     path: 'matching',
-    loadComponent: () => import('./features/matching/matching.component').then(m => m.MatchingComponent),
-    canActivate: [authGuard]
+    component: MatchingComponent // <-- Cambiado de loadComponent a component
+    // Sin canActivate, para que puedan entrar los invitados
   },
   {
     path: 'profile',
