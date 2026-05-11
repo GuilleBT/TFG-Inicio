@@ -1,6 +1,7 @@
 package com.example.trabajofinalgrado.Controller;
 
 import com.example.trabajofinalgrado.DTOs.Response.MatchResponseDTO;
+import com.example.trabajofinalgrado.DTOs.Response.UserSummaryDTO;
 import com.example.trabajofinalgrado.Model.Tecnologia;
 import com.example.trabajofinalgrado.Model.User;
 import com.example.trabajofinalgrado.Repository.UserRepository;
@@ -37,26 +38,14 @@ public class MatchingController {
 
         List<MatchResponseDTO> matches = userRepository.findAll().stream()
                 .filter(u -> !u.getId().equals(currentUser.getId()))
-                .filter(u -> {
-                    Set<Long> susDominaIds = u.getTecnologiasDomina()
-                            .stream().map(Tecnologia::getId).collect(Collectors.toSet());
-                    Set<Long> susAprendeIds = u.getTecnologiasAprende()
-                            .stream().map(Tecnologia::getId).collect(Collectors.toSet());
-
-                    boolean yoPuedoEnsenarle = misDominaIds.stream().anyMatch(susAprendeIds::contains);
-                    boolean elPuedoEnsenarme = susDominaIds.stream().anyMatch(misAprendeIds::contains);
-
-                    return yoPuedoEnsenarle && elPuedoEnsenarme;
-                })
-                .map(u -> buildMatchDTO(u, currentUser, misDominaIds, misAprendeIds))
+                .map(u -> buildMatchDTO(u, misDominaIds, misAprendeIds))
                 .sorted((a, b) -> b.getPuntuacionMatch() - a.getPuntuacionMatch())
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(matches);
     }
 
-    private MatchResponseDTO buildMatchDTO(User otro, User currentUser,
-                                           Set<Long> misDominaIds, Set<Long> misAprendeIds) {
+    private MatchResponseDTO buildMatchDTO(User otro, Set<Long> misDominaIds, Set<Long> misAprendeIds) {
         List<MatchResponseDTO.TecnologiaDTO> queOfrece = otro.getTecnologiasDomina().stream()
                 .filter(t -> misAprendeIds.contains(t.getId()))
                 .map(MatchResponseDTO.TecnologiaDTO::from)
@@ -67,14 +56,22 @@ public class MatchingController {
                 .map(MatchResponseDTO.TecnologiaDTO::from)
                 .collect(Collectors.toList());
 
-        com.example.trabajofinalgrado.DTOs.Response.UserSummaryDTO userSummary =
-                com.example.trabajofinalgrado.DTOs.Response.UserSummaryDTO.from(otro);
+        List<MatchResponseDTO.TecnologiaDTO> todasSusHabilidades = otro.getTecnologiasDomina().stream()
+                .map(MatchResponseDTO.TecnologiaDTO::from)
+                .collect(Collectors.toList());
+
+        List<MatchResponseDTO.TecnologiaDTO> todosIntereses = otro.getTecnologiasAprende().stream()
+                .map(MatchResponseDTO.TecnologiaDTO::from)
+                .collect(Collectors.toList());
 
         MatchResponseDTO dto = new MatchResponseDTO();
-        dto.setUsuario(userSummary);
+        dto.setUsuario(UserSummaryDTO.from(otro));
         dto.setHabilidadesQueOfrece(queOfrece);
         dto.setHabilidadesQueNecesita(queNecesita);
+        dto.setTodasLasHabilidades(todasSusHabilidades);
+        dto.setTodosLosIntereses(todosIntereses);
         dto.setPuntuacionMatch(queOfrece.size() + queNecesita.size());
+        dto.setMatchPerfecto(!queOfrece.isEmpty() && !queNecesita.isEmpty());
         return dto;
     }
 }

@@ -11,8 +11,11 @@ import java.util.List;
 public class MatchResponseDTO {
     private UserSummaryDTO usuario;
     private int puntuacionMatch;
+    private boolean matchPerfecto;
     private List<TecnologiaDTO> habilidadesQueOfrece;
     private List<TecnologiaDTO> habilidadesQueNecesita;
+    private List<TecnologiaDTO> todasLasHabilidades;
+    private List<TecnologiaDTO> todosLosIntereses;
 
     @Getter
     @Setter
