@@ -12,9 +12,11 @@
     <div class="profile-info">
       <div class="name-row">
         <h1>{{ profile.nombre }} {{ profile.apellido }}</h1>
-<!-- profile.component.html (Aproximadamente línea 15) -->
-    <span class="username font-mono">&#64;{{ profile.username }}</span>      </div>
+        <span class="username font-mono">&#64;{{ profile.username }}</span>
+      </div>
       <p class="bio" *ngIf="profile.bio">{{ profile.bio }}</p>
+      <p class="experiencia" *ngIf="profile.experiencia_breve"><strong>Experiencia:</strong> {{ profile.experiencia_breve }}</p>
+      
       <div class="meta-row">
         <span class="meta-item" *ngIf="profile.ubicacion">
           <mat-icon>place</mat-icon> {{ profile.ubicacion }}
@@ -22,6 +24,10 @@
         <a class="meta-item link" *ngIf="profile.github"
            [href]="'https://github.com/' + profile.github" target="_blank">
           <mat-icon>code</mat-icon> {{ profile.github }}
+        </a>
+        <a class="meta-item link" *ngIf="profile.linkedin"
+           [href]="profile.linkedin" target="_blank">
+          <mat-icon>work</mat-icon> LinkedIn
         </a>
         <span class="meta-item" *ngIf="profile.valoracionMedia">
           <mat-icon>star</mat-icon> {{ profile.valoracionMedia | number:'1.1-1' }}
@@ -46,6 +52,7 @@
   <div class="edit-card" *ngIf="editMode && editForm">
     <h2>Editar perfil</h2>
     <form [formGroup]="editForm" class="edit-form">
+      
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">Nombre</label>
@@ -56,21 +63,51 @@
           <div class="input-wrapper"><input formControlName="apellido" class="input-field"></div>
         </div>
       </div>
-      <div class="field-group">
-        <label class="field-label">Sobre mí</label>
-        <div class="input-wrapper">
-          <textarea formControlName="bio" rows="3" class="input-field textarea-field"
-                    placeholder="Cuéntanos algo..."></textarea>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Correo Electrónico</label>
+          <div class="input-wrapper"><input formControlName="email" type="email" class="input-field"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Nueva Contraseña</label>
+          <div class="input-wrapper">
+            <input formControlName="password" type="password" class="input-field" placeholder="Déjalo en blanco para no cambiar">
+          </div>
         </div>
       </div>
+
+      <div class="field-group">
+        <label class="field-label">Experiencia</label>
+        <div class="input-wrapper">
+          <textarea formControlName="experienciaBreve" rows="2" class="input-field textarea-field"
+                    placeholder="Describe brevemente tu experiencia..."></textarea>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Sobre mí (Bio)</label>
+        <div class="input-wrapper">
+          <textarea formControlName="bio" rows="3" class="input-field textarea-field"
+                    placeholder="Cuéntanos algo más personal..."></textarea>
+        </div>
+      </div>
+
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">Ubicación</label>
           <div class="input-wrapper"><input formControlName="ubicacion" class="input-field" placeholder="Madrid, España"></div>
         </div>
         <div class="field-group">
-          <label class="field-label">GitHub username</label>
-          <div class="input-wrapper"><input formControlName="github" class="input-field"></div>
+          <label class="field-label">GitHub</label>
+          <div class="input-wrapper"><input formControlName="github" class="input-field" placeholder="usuario-github"></div>
+        </div>
+      </div>
+
+      <div class="field-row">
+         <div class="field-group">
+          <label class="field-label">LinkedIn (URL)</label>
+          <div class="input-wrapper"><input formControlName="linkedin" class="input-field" placeholder="https://linkedin.com/in/tu-perfil"></div>
         </div>
       </div>
 

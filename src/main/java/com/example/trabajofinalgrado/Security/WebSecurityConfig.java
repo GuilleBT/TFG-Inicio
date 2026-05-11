@@ -5,6 +5,7 @@ import com.example.trabajofinalgrado.Security.JWT.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -54,6 +55,7 @@ public class WebSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -72,19 +74,22 @@ public class WebSecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
-
             .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
-
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
             .authorizeHttpRequests(auth -> auth
+                // Vital: Permitir tráfico OPTIONS para evitar bloqueos falsos de CORS
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                
+                // Rutas públicas
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/tecnologias/**").permitAll()
+                .requestMatchers("/api/users/search").permitAll()
+                .requestMatchers("/api/matching/**").permitAll()
+                
+                // Todo lo demás requiere login
                 .anyRequest().authenticated()
             )
-
             .authenticationProvider(authenticationProvider())
-
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

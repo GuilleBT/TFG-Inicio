@@ -27,6 +27,19 @@ public class MatchingController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<MatchResponseDTO>> getMatches() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // 1. Comprobamos si el que entra es un INVITADO (sin sesión)
+        boolean isGuest = (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal()));
+
+        if (isGuest) {
+            // MODO ESCAPARATE: Devolvemos a todos los usuarios sin calcular el "match"
+            List<MatchResponseDTO> allUsers = userRepository.findAll().stream()
+                    .map(this::buildGuestMatchDTO)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(allUsers);
+        }
+
+        // 2. MODO USUARIO REGISTRADO: Tu lógica de matching inteligente original
         User currentUser = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -55,6 +68,7 @@ public class MatchingController {
         return ResponseEntity.ok(matches);
     }
 
+    // Constructor DTO para usuarios registrados (intersecta tecnologías)
     private MatchResponseDTO buildMatchDTO(User otro, User currentUser,
                                            Set<Long> misDominaIds, Set<Long> misAprendeIds) {
         List<MatchResponseDTO.TecnologiaDTO> queOfrece = otro.getTecnologiasDomina().stream()
@@ -75,6 +89,27 @@ public class MatchingController {
         dto.setHabilidadesQueOfrece(queOfrece);
         dto.setHabilidadesQueNecesita(queNecesita);
         dto.setPuntuacionMatch(queOfrece.size() + queNecesita.size());
+        return dto;
+    }
+
+    // Constructor DTO para invitados (muestra todas las tecnologías sin filtrar)
+    private MatchResponseDTO buildGuestMatchDTO(User otro) {
+        List<MatchResponseDTO.TecnologiaDTO> queOfrece = otro.getTecnologiasDomina().stream()
+                .map(MatchResponseDTO.TecnologiaDTO::from)
+                .collect(Collectors.toList());
+
+        List<MatchResponseDTO.TecnologiaDTO> queNecesita = otro.getTecnologiasAprende().stream()
+                .map(MatchResponseDTO.TecnologiaDTO::from)
+                .collect(Collectors.toList());
+
+        com.example.trabajofinalgrado.DTOs.Response.UserSummaryDTO userSummary =
+                com.example.trabajofinalgrado.DTOs.Response.UserSummaryDTO.from(otro);
+
+        MatchResponseDTO dto = new MatchResponseDTO();
+        dto.setUsuario(userSummary);
+        dto.setHabilidadesQueOfrece(queOfrece);
+        dto.setHabilidadesQueNecesita(queNecesita);
+        dto.setPuntuacionMatch(0); // Para los invitados no hay "puntuación"
         return dto;
     }
 }

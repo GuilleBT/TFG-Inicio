@@ -84,11 +84,16 @@ export class ProfileComponent implements OnInit {
 
   startEdit(): void {
     if (!this.profile) return;
-    this.selectedHabilidades = new Set(this.profile.habilidades.map(h => h.id));
-    this.selectedIntereses = new Set(this.profile.intereses.map(i => i.id));
+    this.selectedHabilidades = new Set(this.profile.habilidades?.map(h => h.id) || []);
+    this.selectedIntereses = new Set(this.profile.intereses?.map(i => i.id) || []);
+    
+    // Inicializamos el formulario con los datos que ya tenemos
     this.editForm = this.fb.group({
       nombre: [this.profile.nombre],
       apellido: [this.profile.apellido],
+      email: [this.profile.email || ''],
+      password: [''], // Por defecto vacío, para no machacar la contraseña
+      experienciaBreve: [this.profile.experiencia_breve || ''], 
       bio: [this.profile.bio || ''],
       ubicacion: [this.profile.ubicacion || ''],
       github: [this.profile.github || ''],
@@ -101,11 +106,20 @@ export class ProfileComponent implements OnInit {
 
   saveEdit(): void {
     if (!this.editForm) return;
+    
+    const formValues = { ...this.editForm.value };
+    
+    // Si la contraseña está vacía, la eliminamos de la caja para que el backend no la toque
+    if (!formValues.password || formValues.password.trim() === '') {
+      delete formValues.password;
+    }
+
     const request = {
-      ...this.editForm.value,
+      ...formValues,
       habilidadesIds: Array.from(this.selectedHabilidades),
       interesesIds: Array.from(this.selectedIntereses),
     };
+
     this.userService.updateMyProfile(request).subscribe({
       next: p => {
         this.profile = p;

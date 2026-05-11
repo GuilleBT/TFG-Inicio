@@ -12,7 +12,14 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  let rawData = authService.getToken() || sessionStorage.getItem('auth-user') || '';
+  let rawData = '';
+
+  // 🛡️ EL ESCUDO ANTI-SSR
+  // Solo intentamos leer el sessionStorage si estamos en el navegador real
+  if (typeof window !== 'undefined' && window.sessionStorage) {
+    rawData = authService.getToken() || sessionStorage.getItem('auth-user') || '';
+  }
+
   let finalToken = '';
 
   if (rawData) {
@@ -30,7 +37,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-
       if (error.status === 401) {
         authService.logout();
         router.navigate(['/login']);
