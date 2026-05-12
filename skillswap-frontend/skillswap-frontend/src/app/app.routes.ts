@@ -38,6 +38,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'minijuegos',
+    loadComponent: () => import('./features/minijuegos/minijuegos').then(m => m.Minijuegos),
+    canActivate: [authGuard]
+  },
+  {
     path: '**',
     redirectTo: ''
   }

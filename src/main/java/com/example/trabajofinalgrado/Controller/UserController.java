@@ -43,7 +43,18 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return ResponseEntity.ok(toMap(user, true));
     }
-
+// ==========================================
+    // NUEVO MÉTODO PARA LISTAR TODOS LOS USUARIOS
+    // ==========================================
+    @GetMapping("/all")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<Map<String, Object>>> getAllUsers() {
+        // Buscamos todos los usuarios y los convertimos al formato seguro (sin contraseñas)
+        List<Map<String, Object>> results = userRepository.findAll().stream()
+                .map(u -> toMap(u, false))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(results);
+    }
     // ==========================================
     // NUEVO MÉTODO PARA ACTUALIZAR EL PERFIL
     // ==========================================
@@ -94,18 +105,26 @@ public class UserController {
         return ResponseEntity.ok(toMap(user, false));
     }
 
-    @GetMapping("/search")
+@GetMapping("/search")
     @Transactional(readOnly = true)
     public ResponseEntity<List<Map<String, Object>>> searchUsers(@RequestParam String q) {
         String query = q.toLowerCase().trim();
         List<Map<String, Object>> results = userRepository.findAll().stream()
-                .filter(u -> u.getNombre().toLowerCase().contains(query)
-                        || u.getApellido().toLowerCase().contains(query)
-                        || u.getUsername().toLowerCase().contains(query)
-                        || u.getEmail().toLowerCase().contains(query))
-                .limit(10)
+                .filter(u -> 
+                        // Buscamos en nombre, apellido o username (con comprobación de nulos para que no pete)
+                        (u.getNombre() != null && u.getNombre().toLowerCase().contains(query)) ||
+                        (u.getApellido() != null && u.getApellido().toLowerCase().contains(query)) ||
+                        (u.getUsername() != null && u.getUsername().toLowerCase().contains(query)) ||
+                        (u.getUbicacion() != null && u.getUbicacion().toLowerCase().contains(query)) ||
+                        
+                        // ¡MAGIA! Buscamos también dentro de las tecnologías que domina
+                        (u.getTecnologiasDomina() != null && u.getTecnologiasDomina().stream()
+                                .anyMatch(tech -> tech.getNombre() != null && tech.getNombre().toLowerCase().contains(query)))
+                )
+                .limit(10) // Limitamos a 10 para no saturar la pantalla
                 .map(u -> toMap(u, false))
                 .collect(Collectors.toList());
+                
         return ResponseEntity.ok(results);
     }
 

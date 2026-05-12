@@ -1,15 +1,14 @@
 package com.example.trabajofinalgrado.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
+
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
@@ -24,7 +23,10 @@ public class User {
 
     private String username;
     private String email;
+
+    @JsonIgnore
     private String password;
+    
     private String nombre;
     private String apellido;
 
@@ -34,22 +36,31 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    // AQUÍ MANTENEMOS TU LÓGICA DE DEVPAIR
-    @ManyToMany
-    @JoinTable(name = "user_domina")
+    // RELACIÓN CORREGIDA: Tecnologías que domina (EAGER y nombres exactos de la BD)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_domina",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "tecnologias_domina_id")
+    )
     private Set<Tecnologia> tecnologiasDomina = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "user_aprende")
+    // RELACIÓN CORREGIDA: Tecnologías que quiere aprender (EAGER y nombres exactos de la BD)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_aprende",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "tecnologias_aprende_id")
+    )
     private Set<Tecnologia> tecnologiasAprende = new HashSet<>();
+
     @Column(length = 100)
     private String experienciaBreve;
 
-    // 2. Nueva imagen de perfil en Base64
     @Column(columnDefinition = "LONGTEXT")
     private String imagenPerfil;
     
-     @Column(length = 500)
+    @Column(length = 500)
     private String bio;
 
     private String ubicacion;
@@ -58,8 +69,7 @@ public class User {
 
     private String linkedin;
 
-    // 3. LA NUEVA RELACIÓN (Borra tu antiguo @ManyToMany de tecnologias domina)
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UsuarioTecnologia> tecnologiasDominaDetalle = new ArrayList<>();
-   
+    @Column(name = "sesiones_completadas")
+    private Integer sesionesCompletadas = 0;
+
 }

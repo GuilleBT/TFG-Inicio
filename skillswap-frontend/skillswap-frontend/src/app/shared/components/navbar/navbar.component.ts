@@ -25,6 +25,7 @@ export class NavbarComponent {
     { label: 'Matches', icon: 'people', path: '/matching' },
     { label: 'Sesiones', icon: 'event', path: '/sessions' },
     { label: 'Reseñas', icon: 'star', path: '/reviews' },
+    { label: 'Minijuegos', icon: 'gamepad', path: '/minijuegos' },
   ];
 
   constructor(
