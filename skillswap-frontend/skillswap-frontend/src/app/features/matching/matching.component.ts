@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatchingService } from '../../core/services/matching.service';
 import { TecnologiaService } from '../../core/services/tecnologia.service';
@@ -19,7 +19,7 @@ interface TecnologiaGroup {
 @Component({
   selector: 'app-matching',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, UserCardComponent, LoginPromptComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MatIconModule, UserCardComponent, LoginPromptComponent],
   templateUrl: './matching.component.html',
   styleUrl: './matching.component.scss'
 })
