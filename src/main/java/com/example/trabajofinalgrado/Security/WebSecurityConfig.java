@@ -63,7 +63,6 @@ public class WebSecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
@@ -77,16 +76,16 @@ public class WebSecurityConfig {
             .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Vital: Permitir tráfico OPTIONS para evitar bloqueos falsos de CORS
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                
-                // Rutas públicas
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/tecnologias/**").permitAll()
-                .requestMatchers("/api/users/search").permitAll()
-                .requestMatchers("/api/matching/**").permitAll()
-                
-                // Todo lo demás requiere login
+
+                // Exploración pública — solo GET
+                .requestMatchers(HttpMethod.GET, "/api/matching").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/reviews/user/**").permitAll()
+
+                // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())

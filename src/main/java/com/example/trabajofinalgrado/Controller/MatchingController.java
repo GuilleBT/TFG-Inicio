@@ -12,8 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
@@ -28,7 +27,18 @@ public class MatchingController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<MatchResponseDTO>> getMatches() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userRepository.findByUsername(auth.getName())
+        boolean isAuthenticated = auth != null && auth.isAuthenticated()
+                && !"anonymousUser".equals(auth.getName());
+
+        if (isAuthenticated) {
+            return ResponseEntity.ok(getPersonalizedMatches(auth.getName()));
+        } else {
+            return ResponseEntity.ok(getPublicUserList());
+        }
+    }
+
+    private List<MatchResponseDTO> getPersonalizedMatches(String username) {
+        User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Set<Long> misDominaIds = currentUser.getTecnologiasDomina()
@@ -36,13 +46,17 @@ public class MatchingController {
         Set<Long> misAprendeIds = currentUser.getTecnologiasAprende()
                 .stream().map(Tecnologia::getId).collect(Collectors.toSet());
 
-        List<MatchResponseDTO> matches = userRepository.findAll().stream()
+        return userRepository.findAll().stream()
                 .filter(u -> !u.getId().equals(currentUser.getId()))
                 .map(u -> buildMatchDTO(u, misDominaIds, misAprendeIds))
                 .sorted((a, b) -> b.getPuntuacionMatch() - a.getPuntuacionMatch())
                 .collect(Collectors.toList());
+    }
 
-        return ResponseEntity.ok(matches);
+    private List<MatchResponseDTO> getPublicUserList() {
+        return userRepository.findAll().stream()
+                .map(u -> buildMatchDTO(u, Collections.emptySet(), Collections.emptySet()))
+                .collect(Collectors.toList());
     }
 
     private MatchResponseDTO buildMatchDTO(User otro, Set<Long> misDominaIds, Set<Long> misAprendeIds) {

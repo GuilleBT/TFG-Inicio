@@ -1,82 +1,74 @@
-<div class="user-card" *ngIf="displayUser">
+<div class="card" [class.card--perfect]="isPerfectMatch" [class.card--match]="hasRealMatch && !isPerfectMatch" *ngIf="displayUser">
 
-  <!-- Match score badge -->
-  <div class="match-score" *ngIf="match && showMatchScore">
-    <span class="score-value">{{ match.puntuacionMatch }}</span>
-    <span class="score-label">coincidencias</span>
+  <!-- Top accent bar -->
+  <div class="card__bar" [class.card__bar--perfect]="isPerfectMatch" [class.card__bar--match]="hasRealMatch && !isPerfectMatch"></div>
+
+  <!-- Badge match perfecto -->
+  <div class="badge-perfect" *ngIf="isPerfectMatch">
+    <span>⚡ Match perfecto</span>
   </div>
 
   <!-- Header -->
-  <div class="card-header">
-    <a [routerLink]="['/profile', displayUser.id]" class="avatar-link">
-      <div class="avatar" *ngIf="!displayUser.avatarUrl">{{ initials }}</div>
-      <img *ngIf="displayUser.avatarUrl" [src]="displayUser.avatarUrl" [alt]="displayUser.nombre" class="avatar-img">
+  <div class="card__header">
+    <a [routerLink]="['/profile', displayUser.id]" class="avatar-wrap">
+      <div class="avatar" [style.background]="'linear-gradient(135deg, ' + avatarColor + '22, ' + avatarColor + '44)'" [style.border-color]="avatarColor + '66'">
+        <span class="avatar__initials" [style.color]="avatarColor">{{ initials }}</span>
+      </div>
+      <div class="avatar__status" *ngIf="isPerfectMatch"></div>
     </a>
-    <div class="user-info">
-      <a [routerLink]="['/profile', displayUser.id]" class="user-name">
+
+    <div class="card__user">
+      <a [routerLink]="['/profile', displayUser.id]" class="card__name">
         {{ displayUser.nombre }} {{ displayUser.apellido }}
       </a>
-      <span class="username font-mono">&#64;{{ displayUser.username }}</span>
-      <div class="user-meta" *ngIf="displayUser.ubicacion || displayUser.valoracionMedia">
-        <span *ngIf="displayUser.ubicacion" class="location">
-          <mat-icon class="meta-icon">place</mat-icon>
-          {{ displayUser.ubicacion }}
-        </span>
-        <app-star-rating
-          *ngIf="displayUser.valoracionMedia"
-          [rating]="displayUser.valoracionMedia"
-          [showCount]="true"
-          [count]="displayUser.totalResenas">
-        </app-star-rating>
+      <span class="card__username font-mono">&#64;{{ displayUser.username }}</span>
+
+      <div class="card__rating" *ngIf="displayUser.valoracionMedia">
+        <app-star-rating [rating]="displayUser.valoracionMedia"></app-star-rating>
+        <span class="rating-val">{{ displayUser.valoracionMedia | number:'1.1-1' }}</span>
+        <span class="rating-count font-mono">({{ displayUser.totalResenas }})</span>
       </div>
+    </div>
+
+    <!-- Score badge -->
+    <div class="score-badge" *ngIf="showMatchScore && matchScore > 0" [class.score-badge--high]="matchScore >= 4">
+      <span class="score-num">{{ matchScore }}</span>
+      <span class="score-lbl">match</span>
     </div>
   </div>
 
   <!-- Bio -->
-  <p class="bio" *ngIf="displayUser.bio">{{ displayUser.bio }}</p>
+  <p class="card__bio" *ngIf="displayUser.bio">{{ displayUser.bio }}</p>
 
-  <!-- Skills & Interests from match context -->
-  <div class="skills-section" *ngIf="match">
-    <div class="skills-group" *ngIf="match.habilidadesQueOfrece.length">
-      <span class="skills-label">Te puede enseñar</span>
-      <div class="chips">
+  <!-- Skills -->
+  <div class="card__skills">
+    <div class="skills-row" *ngIf="teachSkills.length">
+      <span class="skills-row__label skills-row__label--teach">
+        <span class="label-dot label-dot--teach"></span>
+        {{ hasRealMatch && (match?.habilidadesQueOfrece?.length ?? 0) > 0 ? 'Te enseña' : 'Domina' }}
+      </span>
+      <div class="chips-wrap">
         <app-skill-chip
-          *ngFor="let tech of match.habilidadesQueOfrece"
-          [tecnologia]="tech"
+          *ngFor="let t of teachSkills"
+          [tecnologia]="t"
           variant="skill">
         </app-skill-chip>
       </div>
     </div>
-    <div class="skills-group" *ngIf="match.habilidadesQueNecesita.length">
-      <span class="skills-label">Quiere aprender</span>
-      <div class="chips">
-        <app-skill-chip
-          *ngFor="let tech of match.habilidadesQueNecesita"
-          [tecnologia]="tech"
-          variant="interest">
-        </app-skill-chip>
-      </div>
-    </div>
-  </div>
 
-  <!-- Skills from profile context -->
-  <div class="skills-section" *ngIf="!match">
-    <div class="skills-group" *ngIf="displayUser.habilidades?.length">
-      <span class="skills-label">Domina</span>
-      <div class="chips">
-        <app-skill-chip
-          *ngFor="let tech of displayUser.habilidades.slice(0, 4)"
-          [tecnologia]="tech"
-          variant="skill">
-        </app-skill-chip>
-      </div>
+    <div class="skills-divider" *ngIf="teachSkills.length && learnSkills.length">
+      <span class="divider-icon">⇄</span>
     </div>
-    <div class="skills-group" *ngIf="displayUser.intereses?.length">
-      <span class="skills-label">Aprende</span>
-      <div class="chips">
+
+    <div class="skills-row" *ngIf="learnSkills.length">
+      <span class="skills-row__label skills-row__label--learn">
+        <span class="label-dot label-dot--learn"></span>
+        {{ hasRealMatch && (match?.habilidadesQueNecesita?.length ?? 0) > 0 ? 'Quiere que le enseñes' : 'Aprende' }}
+      </span>
+      <div class="chips-wrap">
         <app-skill-chip
-          *ngFor="let tech of displayUser.intereses.slice(0, 4)"
-          [tecnologia]="tech"
+          *ngFor="let t of learnSkills"
+          [tecnologia]="t"
           variant="interest">
         </app-skill-chip>
       </div>
@@ -84,22 +76,23 @@
   </div>
 
   <!-- Footer -->
-  <div class="card-footer">
-    <div class="stats" *ngIf="displayUser.sesionesCompletadas !== undefined">
-      <span class="stat">
-        <mat-icon class="stat-icon">check_circle</mat-icon>
+  <div class="card__footer">
+    <div class="card__stats">
+      <span class="stat" *ngIf="displayUser.sesionesCompletadas">
+        <mat-icon class="stat__icon">check_circle</mat-icon>
         {{ displayUser.sesionesCompletadas }} sesiones
       </span>
     </div>
-    <div class="actions">
-      <a [routerLink]="['/profile', displayUser.id]" class="btn-ghost btn">
+    <div class="card__actions">
+      <a [routerLink]="['/profile', displayUser.id]" class="btn btn-ghost btn-sm">
         <mat-icon>person</mat-icon>
-        Ver perfil
+        Perfil
       </a>
-      <button class="btn-primary btn" (click)="onRequestSession()">
+      <button class="btn btn-primary btn-sm" (click)="onRequestSession()">
         <mat-icon>event</mat-icon>
         Sesión
       </button>
     </div>
   </div>
+
 </div>

@@ -6,17 +6,20 @@
 <div class="page" *ngIf="!loading && profile">
 
   <!-- Header -->
-  <div class="profile-header">
-    <div class="avatar-large" *ngIf="!profile.avatarUrl">{{ initials }}</div>
-    <img *ngIf="profile.avatarUrl" [src]="profile.avatarUrl" class="avatar-img-large" [alt]="profile.nombre">
+  <div class="profile-header card">
+    <div class="profile-avatar-wrap">
+      <div class="avatar-large" *ngIf="!profile.avatarUrl">{{ initials }}</div>
+      <img *ngIf="profile.avatarUrl" [src]="profile.avatarUrl" class="avatar-img-large" [alt]="profile.nombre">
+    </div>
+
     <div class="profile-info">
       <div class="name-row">
         <h1>{{ profile.nombre }} {{ profile.apellido }}</h1>
         <span class="username font-mono">&#64;{{ profile.username }}</span>
       </div>
+
       <p class="bio" *ngIf="profile.bio">{{ profile.bio }}</p>
-      <p class="experiencia" *ngIf="profile.experiencia_breve"><strong>Experiencia:</strong> {{ profile.experiencia_breve }}</p>
-      
+
       <div class="meta-row">
         <span class="meta-item" *ngIf="profile.ubicacion">
           <mat-icon>place</mat-icon> {{ profile.ubicacion }}
@@ -26,33 +29,44 @@
           <mat-icon>code</mat-icon> {{ profile.github }}
         </a>
         <a class="meta-item link" *ngIf="profile.linkedin"
-           [href]="profile.linkedin" target="_blank">
-          <mat-icon>work</mat-icon> LinkedIn
+           [href]="'https://linkedin.com/in/' + profile.linkedin" target="_blank">
+          <mat-icon>work</mat-icon> {{ profile.linkedin }}
         </a>
-        <span class="meta-item" *ngIf="profile.valoracionMedia">
-          <mat-icon>star</mat-icon> {{ profile.valoracionMedia | number:'1.1-1' }}
-          ({{ profile.totalResenas }} reseñas)
-        </span>
-        <span class="meta-item" *ngIf="profile.sesionesCompletadas">
-          <mat-icon>check_circle</mat-icon> {{ profile.sesionesCompletadas }} sesiones
-        </span>
       </div>
-      <div class="actions" *ngIf="!editMode">
+
+      <div class="stats-row" *ngIf="reviews.length > 0 || profile.sesionesCompletadas">
+        <div class="stat-chip" *ngIf="reviews.length > 0">
+          <mat-icon class="stat-icon accent">star</mat-icon>
+          <span class="stat-value">{{ averageRating | number:'1.1-1' }}</span>
+          <span class="stat-label">({{ reviews.length }} reseñas)</span>
+        </div>
+        <div class="stat-chip" *ngIf="profile.sesionesCompletadas">
+          <mat-icon class="stat-icon">check_circle</mat-icon>
+          <span class="stat-value">{{ profile.sesionesCompletadas }}</span>
+          <span class="stat-label">sesiones</span>
+        </div>
+      </div>
+
+      <div class="profile-actions" *ngIf="!editMode">
         <button class="btn btn-primary" *ngIf="isOwnProfile" (click)="startEdit()">
           <mat-icon>edit</mat-icon> Editar perfil
         </button>
-        <button class="btn btn-outline" *ngIf="!isOwnProfile" (click)="requestSession()">
-          <mat-icon>event</mat-icon> Pedir sesión
-        </button>
+        <ng-container *ngIf="!isOwnProfile">
+          <button class="btn btn-primary" (click)="requestSession()">
+            <mat-icon>event</mat-icon> Pedir sesión
+          </button>
+          <a class="btn btn-ghost" routerLink="/matching">
+            <mat-icon>people</mat-icon> Ver comunidad
+          </a>
+        </ng-container>
       </div>
     </div>
   </div>
 
   <!-- Edit form -->
-  <div class="edit-card" *ngIf="editMode && editForm">
+  <div class="edit-card card" *ngIf="editMode && editForm">
     <h2>Editar perfil</h2>
     <form [formGroup]="editForm" class="edit-form">
-      
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">Nombre</label>
@@ -63,120 +77,110 @@
           <div class="input-wrapper"><input formControlName="apellido" class="input-field"></div>
         </div>
       </div>
-
-      <div class="field-row">
-        <div class="field-group">
-          <label class="field-label">Correo Electrónico</label>
-          <div class="input-wrapper"><input formControlName="email" type="email" class="input-field"></div>
-        </div>
-        <div class="field-group">
-          <label class="field-label">Nueva Contraseña</label>
-          <div class="input-wrapper">
-            <input formControlName="password" type="password" class="input-field" placeholder="Déjalo en blanco para no cambiar">
-          </div>
-        </div>
-      </div>
-
       <div class="field-group">
-        <label class="field-label">Experiencia</label>
+        <label class="field-label">Sobre mí</label>
         <div class="input-wrapper">
-          <textarea formControlName="experienciaBreve" rows="2" class="input-field textarea-field"
-                    placeholder="Describe brevemente tu experiencia..."></textarea>
+          <textarea formControlName="bio" class="input-field textarea-field" rows="3"
+                    placeholder="Cuéntanos quién eres y en qué puedes ayudar..."></textarea>
         </div>
       </div>
-
-      <div class="field-group">
-        <label class="field-label">Sobre mí (Bio)</label>
-        <div class="input-wrapper">
-          <textarea formControlName="bio" rows="3" class="input-field textarea-field"
-                    placeholder="Cuéntanos algo más personal..."></textarea>
-        </div>
-      </div>
-
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">Ubicación</label>
-          <div class="input-wrapper"><input formControlName="ubicacion" class="input-field" placeholder="Madrid, España"></div>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">place</mat-icon>
+            <input formControlName="ubicacion" class="input-field" placeholder="Madrid, España">
+          </div>
         </div>
         <div class="field-group">
           <label class="field-label">GitHub</label>
-          <div class="input-wrapper"><input formControlName="github" class="input-field" placeholder="usuario-github"></div>
-        </div>
-      </div>
-
-      <div class="field-row">
-         <div class="field-group">
-          <label class="field-label">LinkedIn (URL)</label>
-          <div class="input-wrapper"><input formControlName="linkedin" class="input-field" placeholder="https://linkedin.com/in/tu-perfil"></div>
-        </div>
-      </div>
-
-      <div class="skills-edit-grid">
-        <div class="skills-block">
-          <p class="section-label">Lo que dominas</p>
-          <div class="tech-grid">
-            <button type="button" *ngFor="let t of tecnologias" class="tech-btn"
-              [class.selected-skill]="selectedHabilidades.has(t.id)"
-              [class.disabled-btn]="selectedIntereses.has(t.id)"
-              [disabled]="selectedIntereses.has(t.id)"
-              (click)="toggleHabilidad(t.id)">
-              {{ t.nombre }}
-            </button>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">code</mat-icon>
+            <input formControlName="github" class="input-field" placeholder="tu-usuario">
           </div>
         </div>
-        <div class="skills-block">
-          <p class="section-label">Lo que quieres aprender</p>
-          <div class="tech-grid">
-            <button type="button" *ngFor="let t of tecnologias" class="tech-btn"
-              [class.selected-interest]="selectedIntereses.has(t.id)"
-              [class.disabled-btn]="selectedHabilidades.has(t.id)"
-              [disabled]="selectedHabilidades.has(t.id)"
-              (click)="toggleInteres(t.id)">
-              {{ t.nombre }}
-            </button>
+        <div class="field-group">
+          <label class="field-label">LinkedIn</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">work</mat-icon>
+            <input formControlName="linkedin" class="input-field" placeholder="tu-usuario">
           </div>
         </div>
       </div>
 
-      <div class="edit-actions">
+      <div class="field-group">
+        <label class="field-label">Lo que dominas</label>
+        <div class="tech-picker">
+          <button type="button"
+            *ngFor="let t of tecnologias"
+            class="tech-chip"
+            [class.selected-skill]="selectedHabilidades.has(t.id)"
+            [class.disabled-chip]="selectedIntereses.has(t.id)"
+            (click)="toggleHabilidad(t.id)">
+            {{ t.nombre }}
+          </button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Lo que quieres aprender</label>
+        <div class="tech-picker">
+          <button type="button"
+            *ngFor="let t of tecnologias"
+            class="tech-chip"
+            [class.selected-interest]="selectedIntereses.has(t.id)"
+            [class.disabled-chip]="selectedHabilidades.has(t.id)"
+            (click)="toggleInteres(t.id)">
+            {{ t.nombre }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-footer">
         <button type="button" class="btn btn-ghost" (click)="cancelEdit()">Cancelar</button>
-        <button type="button" class="btn btn-primary" (click)="saveEdit()">Guardar cambios</button>
+        <button type="button" class="btn btn-primary" (click)="saveEdit()">
+          <mat-icon>save</mat-icon> Guardar cambios
+        </button>
       </div>
     </form>
   </div>
 
-  <!-- Skills (view) -->
-  <div class="skills-row" *ngIf="!editMode">
-    <div class="info-card">
-      <h3>🎯 Domina</h3>
-      <div class="chips-wrap" *ngIf="profile.habilidades?.length; else noSkills">
+  <!-- Skills -->
+  <div class="skills-grid" *ngIf="!editMode">
+    <div class="card skills-card">
+      <h2 class="card-title">
+        <mat-icon class="title-icon skill-icon">rocket_launch</mat-icon>
+        Domina
+      </h2>
+      <div class="chips" *ngIf="profile.habilidades?.length">
         <app-skill-chip *ngFor="let t of profile.habilidades" [tecnologia]="t" variant="skill"></app-skill-chip>
       </div>
-      <ng-template #noSkills><p class="empty-chips">Sin habilidades definidas</p></ng-template>
+      <p class="empty-text" *ngIf="!profile.habilidades?.length">Sin habilidades definidas</p>
     </div>
-    <div class="info-card">
-      <h3>📚 Quiere aprender</h3>
-      <div class="chips-wrap" *ngIf="profile.intereses?.length; else noInterests">
+
+    <div class="card skills-card">
+      <h2 class="card-title">
+        <mat-icon class="title-icon interest-icon">school</mat-icon>
+        Quiere aprender
+      </h2>
+      <div class="chips" *ngIf="profile.intereses?.length">
         <app-skill-chip *ngFor="let t of profile.intereses" [tecnologia]="t" variant="interest"></app-skill-chip>
       </div>
-      <ng-template #noInterests><p class="empty-chips">Sin intereses definidos</p></ng-template>
+      <p class="empty-text" *ngIf="!profile.intereses?.length">Sin intereses definidos</p>
     </div>
   </div>
 
   <!-- Reviews -->
-  <div class="reviews-section" *ngIf="!editMode">
-    <h2>Reseñas
-      <span class="review-count">({{ reviews.length }})</span>
+  <div class="card reviews-section" *ngIf="reviews.length > 0">
+    <h2 class="card-title">
+      <mat-icon class="title-icon accent">star</mat-icon>
+      Reseñas ({{ reviews.length }})
     </h2>
-    <div class="empty-state" *ngIf="reviews.length === 0">
-      <span class="empty-icon">⭐</span>
-      <p>Aún no hay reseñas para este perfil</p>
-    </div>
     <div class="reviews-list">
-      <div class="review-card" *ngFor="let r of reviews">
-        <div class="review-header">
+      <div class="review-item" *ngFor="let r of reviews">
+        <div class="review-head">
           <div class="review-avatar">{{ r.autorNombre?.[0] ?? '?' }}</div>
-          <div>
+          <div class="review-meta">
             <span class="review-author">{{ r.autorNombre }}</span>
             <app-star-rating [rating]="r.puntuacion"></app-star-rating>
           </div>
@@ -186,4 +190,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Empty reviews -->
+  <div class="card reviews-section empty-reviews" *ngIf="reviews.length === 0 && !loading">
+    <h2 class="card-title">
+      <mat-icon class="title-icon accent">star</mat-icon>
+      Reseñas
+    </h2>
+    <p class="empty-text">Todavía no hay reseñas para este perfil.</p>
+  </div>
+
 </div>
+
+<!-- Login prompt para invitados -->
+<app-login-prompt
+  *ngIf="showLoginPrompt"
+  actionLabel="solicitar una sesión"
+  (close)="showLoginPrompt = false">
+</app-login-prompt>

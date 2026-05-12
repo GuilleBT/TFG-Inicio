@@ -4,6 +4,12 @@ import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 
+const PUBLIC_ROUTES = ['/api/matching', '/api/users/search', '/api/reviews/user', '/api/tecnologias', '/api/auth/'];
+
+function isPublicRoute(url: string): boolean {
+  return PUBLIC_ROUTES.some(route => url.includes(route));
+}
+
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
@@ -12,14 +18,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  let rawData = '';
-
-  // 🛡️ EL ESCUDO ANTI-SSR
-  // Solo intentamos leer el sessionStorage si estamos en el navegador real
-  if (typeof window !== 'undefined' && window.sessionStorage) {
-    rawData = authService.getToken() || sessionStorage.getItem('auth-user') || '';
-  }
-
+  let rawData = authService.getToken() || sessionStorage.getItem('auth-user') || '';
   let finalToken = '';
 
   if (rawData) {
@@ -38,6 +37,9 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
+        if (isPublicRoute(req.url)) {
+          return throwError(() => error);
+        }
         authService.logout();
         router.navigate(['/login']);
       }

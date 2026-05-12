@@ -1,59 +1,203 @@
-<div class="page">
-  <div class="page-header">
-    <div>
-      <h1>Encuentra tu Match ⇄</h1>
-      <p>Personas cuyas habilidades complementan exactamente las tuyas</p>
+<div class="matching-page">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar__left">
+      <button class="sidebar-toggle" (click)="sidebarOpen = !sidebarOpen" [title]="sidebarOpen ? 'Ocultar filtros' : 'Mostrar filtros'">
+        <mat-icon>{{ sidebarOpen ? 'filter_list_off' : 'filter_list' }}</mat-icon>
+        <span>Filtros</span>
+        <span class="filter-count" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
+      </button>
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Buscar por nombre o tecnología..."
+          class="search-input"
+        />
+        <button class="clear-search" *ngIf="searchQuery" (click)="searchQuery = ''">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="top-bar__right">
+      <span class="results-count font-mono">
+        {{ filteredMatches.length }} resultado{{ filteredMatches.length !== 1 ? 's' : '' }}
+      </span>
+      <a routerLink="/register" class="btn btn-primary btn-sm" *ngIf="!authService.isAuthenticated()">
+        Crear cuenta gratis
+      </a>
     </div>
   </div>
 
-  <!-- Search -->
-  <div class="search-bar">
-    <mat-icon class="search-icon">search</mat-icon>
-    <input
-      type="text"
-      [(ngModel)]="searchQuery"
-      placeholder="Buscar por nombre o tecnología..."
-      class="search-input"
-    />
-    <button class="btn btn-ghost btn-sm" *ngIf="searchQuery" (click)="searchQuery = ''">
-      <mat-icon>close</mat-icon>
-    </button>
+  <!-- Active filter chips -->
+  <div class="active-filters" *ngIf="activeFilterChips.length > 0">
+    <span class="active-filters__label">Filtros activos:</span>
+    <div class="active-chips">
+      <button class="active-chip" *ngFor="let chip of activeFilterChips" (click)="removeChip(chip)">
+        {{ chip.label }}
+        <mat-icon class="chip-remove">close</mat-icon>
+      </button>
+      <button class="clear-all" (click)="clearFilters()">Limpiar todo</button>
+    </div>
   </div>
 
-  <!-- Loading -->
-  <div class="loading-state" *ngIf="loading">
-    <div class="spinner-lg"></div>
-    <span>Buscando matches...</span>
+  <!-- MAIN LAYOUT -->
+  <div class="layout" [class.layout--collapsed]="!sidebarOpen">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" [class.sidebar--hidden]="!sidebarOpen">
+
+      <!-- Matches perfectos toggle -->
+      <div class="sidebar-card" *ngIf="authService.isAuthenticated()">
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <span class="toggle-title">⚡ Solo matches perfectos</span>
+            <span class="toggle-sub">Intercambio mutuo garantizado</span>
+          </div>
+          <div class="toggle-switch" [class.on]="soloMatchPerfecto" (click)="soloMatchPerfecto = !soloMatchPerfecto">
+            <div class="toggle-thumb"></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Filtro: Lo que enseñan -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">
+          <span class="title-dot title-dot--teach"></span>
+          Lo que enseñan
+        </h3>
+        <div class="filter-groups">
+          <div class="filter-group" *ngFor="let grupo of gruposEnsena">
+            <button class="group-header" (click)="grupo.expanded = !grupo.expanded">
+              <span>{{ grupo.label }}</span>
+              <mat-icon>{{ grupo.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="group-items" *ngIf="grupo.expanded">
+              <label class="filter-item" *ngFor="let t of grupo.items">
+                <input
+                  type="checkbox"
+                  [checked]="filtroEnsena.has(t.id)"
+                  (change)="toggleEnsena(t.id)"
+                  class="filter-checkbox"
+                />
+                <span class="filter-name">{{ t.nombre }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro: Lo que aprenden -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">
+          <span class="title-dot title-dot--learn"></span>
+          Lo que aprenden
+        </h3>
+        <div class="filter-groups">
+          <div class="filter-group" *ngFor="let grupo of gruposAprende">
+            <button class="group-header" (click)="grupo.expanded = !grupo.expanded">
+              <span>{{ grupo.label }}</span>
+              <mat-icon>{{ grupo.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="group-items" *ngIf="grupo.expanded">
+              <label class="filter-item" *ngFor="let t of grupo.items">
+                <input
+                  type="checkbox"
+                  [checked]="filtroAprende.has(t.id)"
+                  (change)="toggleAprende(t.id)"
+                  class="filter-checkbox"
+                />
+                <span class="filter-name">{{ t.nombre }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Guest banner -->
+      <div class="guest-banner" *ngIf="!authService.isAuthenticated()">
+        <mat-icon>info_outline</mat-icon>
+        <span>Estás explorando como invitado. <strong>Regístrate gratis</strong> para ver tus matches personalizados.</span>
+        <a routerLink="/register" class="btn btn-ghost btn-sm">Crear cuenta</a>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-lg"></div>
+        <span>Cargando comunidad...</span>
+      </div>
+
+      <!-- Error -->
+      <div class="error-alert" *ngIf="error && !loading">
+        <mat-icon>error_outline</mat-icon>
+        {{ error }}
+        <button class="btn btn-ghost btn-sm" (click)="loadMatches()">Reintentar</button>
+      </div>
+
+      <ng-container *ngIf="!loading && !error">
+
+        <!-- Matches perfectos -->
+        <ng-container *ngIf="authService.isAuthenticated() && perfectMatches.length > 0">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span>🎯</span>
+              Tus matches perfectos
+              <span class="count-badge">{{ perfectMatches.length }}</span>
+            </h2>
+            <p class="section-sub">Se enseñan mutuamente — el intercambio ideal</p>
+          </div>
+          <div class="cards-grid">
+            <app-user-card
+              *ngFor="let m of perfectMatches"
+              [match]="m"
+              [showMatchScore]="true"
+              (requestSession)="onRequestSession($event)">
+            </app-user-card>
+          </div>
+        </ng-container>
+
+        <!-- Resto de usuarios -->
+        <div class="section-header" [class.mt-0]="!authService.isAuthenticated() || perfectMatches.length === 0">
+          <h2 class="section-title">
+            <span>🌍</span>
+            {{ authService.isAuthenticated() && perfectMatches.length > 0 ? 'Explorar comunidad' : 'Comunidad' }}
+            <span class="count-badge">{{ (authService.isAuthenticated() ? otherMatches : filteredMatches).length }}</span>
+          </h2>
+          <p class="section-sub">Descubre qué enseñan y qué aprenden</p>
+        </div>
+
+        <div class="empty-state" *ngIf="filteredMatches.length === 0">
+          <span>🔍</span>
+          <h3>Sin resultados</h3>
+          <p>Prueba con otros filtros o borra la búsqueda.</p>
+          <button class="btn btn-outline btn-sm" (click)="clearFilters()">Limpiar filtros</button>
+        </div>
+
+        <div class="cards-grid">
+          <app-user-card
+            *ngFor="let m of authService.isAuthenticated() ? otherMatches : filteredMatches"
+            [match]="m"
+            [showMatchScore]="authService.isAuthenticated()"
+            (requestSession)="onRequestSession($event)">
+          </app-user-card>
+        </div>
+
+      </ng-container>
+    </main>
   </div>
 
-  <!-- Error -->
-  <div class="error-alert" *ngIf="error && !loading">
-    <mat-icon>error_outline</mat-icon>
-    Error al cargar los matches. {{ error }}
-    <button class="btn btn-ghost btn-sm" (click)="loadMatches()">Reintentar</button>
-  </div>
-
-  <!-- Empty -->
-  <div class="empty-state" *ngIf="!loading && !error && filteredMatches.length === 0">
-    <span class="empty-icon">🔍</span>
-    <h3>No hay matches disponibles</h3>
-    <p *ngIf="matches.length === 0">
-      Completa tu perfil con habilidades e intereses para encontrar compañeros.
-    </p>
-    <p *ngIf="matches.length > 0">Ningún match coincide con la búsqueda.</p>
-  </div>
-
-  <!-- Count -->
-  <div class="match-count font-mono" *ngIf="!loading && filteredMatches.length > 0">
-    {{ filteredMatches.length }} match{{ filteredMatches.length !== 1 ? 'es' : '' }} encontrado{{ filteredMatches.length !== 1 ? 's' : '' }}
-  </div>
-
-  <!-- Grid -->
-  <div class="cards-grid" *ngIf="!loading && filteredMatches.length > 0">
-    <app-user-card
-      *ngFor="let match of filteredMatches"
-      [match]="match"
-      (requestSession)="onRequestSession($event)">
-    </app-user-card>
-  </div>
 </div>
+
+<app-login-prompt
+  *ngIf="showLoginPrompt"
+  [actionLabel]="loginPromptAction"
+  (close)="showLoginPrompt = false">
+</app-login-prompt>

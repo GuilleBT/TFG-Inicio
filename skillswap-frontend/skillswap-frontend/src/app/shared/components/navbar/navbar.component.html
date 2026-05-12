@@ -1,23 +1,30 @@
 <nav class="navbar">
   <div class="navbar-inner container">
-    <a class="navbar-logo" routerLink="/matching">
+    <a class="navbar-logo" routerLink="/">
       <span class="logo-icon">⇄</span>
       <span class="logo-text">Skill<span class="logo-accent">Swap</span></span>
     </a>
 
     <div class="navbar-links">
-      <a
-        *ngFor="let link of navLinks"
-        class="nav-link"
-        [routerLink]="link.path"
-        routerLinkActive="active">
-        <mat-icon class="nav-icon">{{ link.icon }}</mat-icon>
-        <span>{{ link.label }}</span>
+      <a class="nav-link" routerLink="/matching" routerLinkActive="active">
+        <mat-icon class="nav-icon">people</mat-icon>
+        <span>Comunidad</span>
       </a>
+      <ng-container *ngIf="authService.isAuthenticated()">
+        <a class="nav-link" routerLink="/sessions" routerLinkActive="active">
+          <mat-icon class="nav-icon">event</mat-icon>
+          <span>Sesiones</span>
+        </a>
+        <a class="nav-link" routerLink="/reviews" routerLinkActive="active">
+          <mat-icon class="nav-icon">star</mat-icon>
+          <span>Reseñas</span>
+        </a>
+      </ng-container>
     </div>
 
-    <div class="navbar-user">
-      <a class="user-avatar-btn" [routerLink]="'/profile'" [matMenuTriggerFor]="userMenu">
+    <!-- Usuario autenticado -->
+    <div class="navbar-user" *ngIf="authService.isAuthenticated()">
+      <a class="user-avatar-btn" routerLink="/profile" [matMenuTriggerFor]="userMenu">
         <div class="avatar-circle" *ngIf="!currentUser()?.avatarUrl">
           {{ getInitials() }}
         </div>
@@ -40,39 +47,65 @@
           <mat-icon>event</mat-icon>
           <span>Mis Sesiones</span>
         </a>
+        <a mat-menu-item routerLink="/reviews">
+          <mat-icon>star</mat-icon>
+          <span>Mis Reseñas</span>
+        </a>
         <div class="menu-divider"></div>
         <button mat-menu-item (click)="logout()" class="logout-item">
           <mat-icon>logout</mat-icon>
           <span>Cerrar sesión</span>
         </button>
       </mat-menu>
-
-      <button class="hamburger" (click)="toggleMobileMenu()" aria-label="Menu">
-        <span [class.open]="mobileMenuOpen"></span>
-        <span [class.open]="mobileMenuOpen"></span>
-        <span [class.open]="mobileMenuOpen"></span>
-      </button>
     </div>
-  </div>
 
-  <div class="mobile-menu" [class.open]="mobileMenuOpen">
-    <a
-      *ngFor="let link of navLinks"
-      class="mobile-nav-link"
-      [routerLink]="link.path"
-      routerLinkActive="active"
-      (click)="mobileMenuOpen = false">
-      <mat-icon>{{ link.icon }}</mat-icon>
-      <span>{{ link.label }}</span>
-    </a>
-    <div class="mobile-divider"></div>
-    <a class="mobile-nav-link" routerLink="/profile" (click)="mobileMenuOpen = false">
-      <mat-icon>person</mat-icon>
-      <span>Mi Perfil</span>
-    </a>
-    <button class="mobile-logout" (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Cerrar sesión</span>
+    <!-- Invitado -->
+    <div class="navbar-guest" *ngIf="!authService.isAuthenticated()">
+      <a routerLink="/login" class="btn btn-ghost btn-sm">Entrar</a>
+      <a routerLink="/register" class="btn btn-primary btn-sm">Registrarse</a>
+    </div>
+
+    <button class="hamburger" (click)="toggleMobileMenu()" aria-label="Menu">
+      <span [class.open]="mobileMenuOpen"></span>
+      <span [class.open]="mobileMenuOpen"></span>
+      <span [class.open]="mobileMenuOpen"></span>
     </button>
   </div>
-</nav> 
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" [class.open]="mobileMenuOpen">
+    <a class="mobile-nav-link" routerLink="/matching" routerLinkActive="active" (click)="mobileMenuOpen = false">
+      <mat-icon>people</mat-icon>
+      <span>Comunidad</span>
+    </a>
+    <ng-container *ngIf="authService.isAuthenticated()">
+      <a class="mobile-nav-link" routerLink="/sessions" routerLinkActive="active" (click)="mobileMenuOpen = false">
+        <mat-icon>event</mat-icon>
+        <span>Sesiones</span>
+      </a>
+      <a class="mobile-nav-link" routerLink="/reviews" routerLinkActive="active" (click)="mobileMenuOpen = false">
+        <mat-icon>star</mat-icon>
+        <span>Reseñas</span>
+      </a>
+      <div class="mobile-divider"></div>
+      <a class="mobile-nav-link" routerLink="/profile" (click)="mobileMenuOpen = false">
+        <mat-icon>person</mat-icon>
+        <span>Mi Perfil</span>
+      </a>
+      <button class="mobile-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="!authService.isAuthenticated()">
+      <a class="mobile-nav-link" routerLink="/login" (click)="mobileMenuOpen = false">
+        <mat-icon>login</mat-icon>
+        <span>Entrar</span>
+      </a>
+      <a class="mobile-nav-link accent" routerLink="/register" (click)="mobileMenuOpen = false">
+        <mat-icon>person_add</mat-icon>
+        <span>Registrarse gratis</span>
+      </a>
+    </ng-container>
+  </div>
+</nav>
