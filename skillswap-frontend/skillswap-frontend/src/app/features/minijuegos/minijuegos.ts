@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { AuthService } from  '../../core/services/auth.service';
 
 // Actualizamos las interfaces para que coincidan con el nuevo JSON de la API
 interface Answer {
@@ -31,7 +33,12 @@ export class Minijuegos implements OnInit {
   respondido = false;
   esCorrecto = false;
 
-  constructor(private http: HttpClient) {}
+  // Inyectamos el AuthService y el Router para controlar el acceso
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadQuiz();
@@ -112,8 +119,15 @@ export class Minijuegos implements OnInit {
     return texto;
   }
 
-  // Ahora es mucho más fácil, el HTML nos pasará directamente si es correcta o no
+  // LA TRAMPA: Controlamos si está logueado al intentar responder
   verificarRespuesta(isCorrect: boolean): void {
+    // 1. Si NO está autenticado, le mandamos al login inmediatamente
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // 2. Si SÍ está autenticado, comprobamos la respuesta con normalidad
     if (this.respondido || !this.quiz) return;
     this.esCorrecto = isCorrect;
     this.respondido = true;

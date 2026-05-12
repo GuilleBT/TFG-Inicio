@@ -10,6 +10,11 @@
         <mat-icon class="nav-icon">people</mat-icon>
         <span>Comunidad</span>
       </a>
+      <!-- AÑADIDO: Minijuegos visible para todos -->
+      <a class="nav-link" routerLink="/minijuegos" routerLinkActive="active">
+        <mat-icon class="nav-icon">gamepad</mat-icon>
+        <span>Minijuegos</span>
+      </a>
       <ng-container *ngIf="authService.isAuthenticated()">
         <a class="nav-link" routerLink="/sessions" routerLinkActive="active">
           <mat-icon class="nav-icon">event</mat-icon>
@@ -77,6 +82,11 @@
     <a class="mobile-nav-link" routerLink="/matching" routerLinkActive="active" (click)="mobileMenuOpen = false">
       <mat-icon>people</mat-icon>
       <span>Comunidad</span>
+    </a>
+    <!-- AÑADIDO: Minijuegos visible para todos en móvil -->
+    <a class="mobile-nav-link" routerLink="/minijuegos" routerLinkActive="active" (click)="mobileMenuOpen = false">
+      <mat-icon>gamepad</mat-icon>
+      <span>Minijuegos</span>
     </a>
     <ng-container *ngIf="authService.isAuthenticated()">
       <a class="mobile-nav-link" routerLink="/sessions" routerLinkActive="active" (click)="mobileMenuOpen = false">
