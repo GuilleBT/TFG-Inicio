@@ -71,6 +71,7 @@ export class UserService {
       sesionesCompletadas:  r.sesionesCompletadas ?? undefined,
       habilidades:          r.habilidades ?? r.tecnologias_domina ?? [],
       intereses:            r.intereses ?? r.tecnologias_aprende ?? [],
+      rachaDiasAprendiendo: r.rachaDiasAprendiendo ?? r.racha_dias_aprendiendo ?? 0,
     };
   }
 }

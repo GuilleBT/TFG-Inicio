@@ -1,7 +1,8 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +18,7 @@ import { MatBadgeModule } from '@angular/material/badge';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   currentUser = computed(() => this.authService.currentUser());
   mobileMenuOpen = false;
 
@@ -30,8 +31,18 @@ export class NavbarComponent {
 
   constructor(
     public authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated() && this.currentUser()?.rachaDiasAprendiendo == null) {
+      this.userService.getMyProfile().subscribe({
+        next: user => this.authService.updateCurrentUser(user),
+        error: () => {}
+      });
+    }
+  }
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;

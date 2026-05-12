@@ -13,6 +13,7 @@ import { UserProfile } from '../../core/models/user.model'; // Asegúrate de que
 })
 export class HomeComponent implements OnInit {
   usuariosRanking: UserProfile[] = [];
+  topLanguages: { nombre: string; count: number }[] = [];
 
   features = [
     { icon: '🎯', title: 'Matching Inteligente', desc: 'Nuestro algoritmo analiza tus skills e intereses y te conecta con el compañero perfecto para intercambiar conocimiento.' },
@@ -26,7 +27,6 @@ export class HomeComponent implements OnInit {
     { value: '⇄', label: 'Trueque de conocimiento' },
     { value: '∞', label: 'Tecnologías disponibles' },
   ];
-user: any;
 
   constructor(private userService: UserService) {}
 
@@ -35,14 +35,35 @@ user: any;
   }
 
   cargarRanking(): void {
-    this.userService.searchUsers('').subscribe({
+    this.userService.getAllUsers().subscribe({
       next: (data) => {
         console.log('--- DATOS CRUDOS DEL BACKEND ---');
-        console.table(data); // Esto sacará una tabla preciosa en la consola del navegador
-        
+        console.table(data);
+
         this.usuariosRanking = [...data]
           .sort((a, b) => (b.sesionesCompletadas || 0) - (a.sesionesCompletadas || 0))
           .slice(0, 3);
+
+        const languageCounts = new Map<string, number>();
+        data.forEach(user => {
+          user.intereses?.forEach(tecnologia => {
+            if (!tecnologia?.nombre) return;
+            const current = languageCounts.get(tecnologia.nombre) ?? 0;
+            languageCounts.set(tecnologia.nombre, current + 1);
+          });
+        });
+
+        const defaultLanguages = ['Java', 'Angular', 'HTML'];
+        defaultLanguages.forEach(lang => {
+          if (!languageCounts.has(lang)) {
+            languageCounts.set(lang, 0);
+          }
+        });
+
+        this.topLanguages = Array.from(languageCounts.entries())
+          .map(([nombre, count]) => ({ nombre, count }))
+          .sort((a, b) => b.count - a.count || a.nombre.localeCompare(b.nombre))
+          .slice(0, 5);
       },
       error: (err) => console.error(err)
     });

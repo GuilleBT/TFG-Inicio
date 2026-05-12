@@ -129,6 +129,51 @@
     font-size: 18px;
     color: var(--text-muted);
   }
+
+  .user-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 95, 60, 0.12);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .streak-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: rgba(255, 95, 60, 0.2);
+    color: #ff5f3c;
+    font-size: 14px;
+  }
+
+  .streak-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background: #ff5f3c;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 0 6px;
+  }
 }
 
 .avatar-circle {

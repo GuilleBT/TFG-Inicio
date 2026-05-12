@@ -66,7 +66,8 @@ export class AuthService {
       nombre:     response.username, // el back no devuelve nombre en signin
       apellido:   '',
       habilidades: [],
-      intereses:   []
+      intereses:   [],
+      rachaDiasAprendiendo: undefined
     };
 
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));

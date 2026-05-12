@@ -141,6 +141,8 @@ public class UserController {
         data.put("github", user.getGithub());
         data.put("linkedin", user.getLinkedin());
         data.put("imagen_perfil", user.getImagenPerfil());
+        data.put("racha_dias_aprendiendo", user.getRachaDiasAprendiendo());
+        data.put("rachaDiasAprendiendo", user.getRachaDiasAprendiendo());
         
         data.put("tecnologias_domina", user.getTecnologiasDomina().stream()
                 .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(),

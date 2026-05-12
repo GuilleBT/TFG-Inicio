@@ -22,6 +22,7 @@ export interface UserProfile {
   valoracionMedia?: number;
   totalResenas?: number;
   sesionesCompletadas?: number;
+  rachaDiasAprendiendo?: number;
   fechaRegistro?: string;
   activo?: boolean;
 }

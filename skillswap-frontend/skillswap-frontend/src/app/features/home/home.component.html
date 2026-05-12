@@ -101,7 +101,7 @@
               <h3>{{ usuariosRanking[1].nombre }}</h3>
               <span class="username">usuario: {{ usuariosRanking[1].username }}</span>
               <div class="stat-box">
-                <span class="stat-num">{{ user.sesionesCompletadas != null ? user.sesionesCompletadas : 0 }}</span>
+                <span class="stat-num">{{ usuariosRanking[1].sesionesCompletadas || 0 }}</span>
                 <span class="stat-label">SESIONES REALIZADAS</span>
               </div>
             </div>
@@ -120,7 +120,7 @@
               <h3>{{ usuariosRanking[0].nombre }}</h3>
               <span class="username">usuario: {{ usuariosRanking[0].username }}</span>
               <div class="stat-box">
-                <span class="stat-num">{{ user.sesionesCompletadas != null ? user.sesionesCompletadas : 0 }}</span>
+                <span class="stat-num">{{ usuariosRanking[0].sesionesCompletadas || 0 }}</span>
                 <span class="stat-label">SESIONES REALIZADAS</span>
               </div>
             </div>
@@ -139,7 +139,7 @@
               <h3>{{ usuariosRanking[2].nombre }}</h3>
               <span class="username">usuario: {{ usuariosRanking[2].username }}</span>
               <div class="stat-box">
-                <span class="stat-num">{{ user.sesionesCompletadas != null ? user.sesionesCompletadas : 0 }}</span>
+                <span class="stat-num">{{ usuariosRanking[2].sesionesCompletadas || 0 }}</span>
                 <span class="stat-label">SESIONES REALIZADAS</span>
               </div>
             </div>
@@ -149,6 +149,30 @@
 
       <div *ngIf="!usuariosRanking || usuariosRanking.length === 0" class="empty-ranking">
         <p class="text-muted">Todavía no hay mentores con sesiones completadas esta semana.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="language-ranking-section">
+    <div class="container text-center">
+      <p class="section-label">Reconocimiento</p>
+      <h2 class="section-title text-white">Lenguajes más aprendidos</h2>
+      <div class="podium-container" *ngIf="topLanguages && topLanguages.length > 0">
+        <div class="podium-item" *ngFor="let lang of topLanguages | slice:0:3; let idx = index"
+             [ngClass]="{ 'first-place': idx === 0 }"
+             [style.order]="idx === 0 ? 2 : idx === 1 ? 1 : 3">
+          <div class="podium-card">
+            <div class="rank-badge">#{{ idx + 1 }}</div>
+            <h3>{{ lang.nombre }}</h3>
+            <div class="stat-box">
+              <span class="stat-num">{{ lang.count }}</span>
+              <span class="stat-label">APRENDICES</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!topLanguages || topLanguages.length === 0" class="empty-ranking">
+        <p class="text-muted">Aún no hay datos suficientes para mostrar los lenguajes más aprendidos.</p>
       </div>
     </div>
   </section>

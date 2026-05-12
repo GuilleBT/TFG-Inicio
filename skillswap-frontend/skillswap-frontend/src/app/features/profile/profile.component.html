@@ -7,9 +7,16 @@
 
   <!-- Header -->
   <div class="profile-header card">
-    <div class="profile-avatar-wrap">
-      <div class="avatar-large" *ngIf="!profile.avatarUrl">{{ initials }}</div>
-      <img *ngIf="profile.avatarUrl" [src]="profile.avatarUrl" class="avatar-img-large" [alt]="profile.nombre">
+    <div class="profile-left">
+      <div class="profile-avatar-wrap">
+        <div class="avatar-large" *ngIf="!profile.avatarUrl">{{ initials }}</div>
+        <img *ngIf="profile.avatarUrl" [src]="profile.avatarUrl" class="avatar-img-large" [alt]="profile.nombre">
+      </div>
+      <div class="profile-streak-card" *ngIf="profile.rachaDiasAprendiendo != null">
+        <span class="profile-streak-icon">🔥</span>
+        <span class="profile-streak-value">{{ profile.rachaDiasAprendiendo }}</span>
+        <span class="profile-streak-label">día{{ profile.rachaDiasAprendiendo === 1 ? '' : 's' }} seguidos</span>
+      </div>
     </div>
 
     <div class="profile-info">
@@ -34,7 +41,7 @@
         </a>
       </div>
 
-      <div class="stats-row" *ngIf="reviews.length > 0 || profile.sesionesCompletadas">
+      <div class="stats-row" *ngIf="reviews.length > 0 || profile.sesionesCompletadas || profile.rachaDiasAprendiendo != null">
         <div class="stat-chip" *ngIf="reviews.length > 0">
           <mat-icon class="stat-icon accent">star</mat-icon>
           <span class="stat-value">{{ averageRating | number:'1.1-1' }}</span>
@@ -44,6 +51,11 @@
           <mat-icon class="stat-icon">check_circle</mat-icon>
           <span class="stat-value">{{ profile.sesionesCompletadas }}</span>
           <span class="stat-label">sesiones</span>
+        </div>
+        <div class="stat-chip" *ngIf="profile.rachaDiasAprendiendo != null">
+          <mat-icon class="stat-icon accent">bolt</mat-icon>
+          <span class="stat-value">{{ profile.rachaDiasAprendiendo }}</span>
+          <span class="stat-label">día{{ profile.rachaDiasAprendiendo === 1 ? '' : 's' }} seguidos</span>
         </div>
       </div>
 

@@ -72,4 +72,7 @@ public class User {
     @Column(name = "sesiones_completadas")
     private Integer sesionesCompletadas = 0;
 
+    @Column(name = "racha_dias_aprendiendo")
+    private Integer rachaDiasAprendiendo = 0;
+
 }
