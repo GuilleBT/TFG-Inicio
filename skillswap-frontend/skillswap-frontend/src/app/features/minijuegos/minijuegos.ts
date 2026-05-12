@@ -37,7 +37,7 @@ export class Minijuegos implements OnInit {
     this.loadQuiz();
   }
 
-loadQuiz(): void {
+  loadQuiz(): void {
     this.loading = true;
     this.respondido = false;
     
@@ -53,21 +53,63 @@ loadQuiz(): void {
 
           // 3. Ahora sí, Angular entiende que es un objeto y puede leer 'data'
           if (response && response.data && response.data.length > 0) {
-            this.quiz = response.data[0];
+            // ¡MAGIA DE TRADUCCIÓN! En lugar de mostrarlo directo, lo mandamos traducir
+            this.traducirQuizCompleto(response.data[0]);
           } else {
             console.warn("El objeto JSON no tiene la propiedad 'data'.");
+            this.loading = false;
           }
         } catch (e) {
           console.error("Error al transformar el JSON:", e);
+          this.loading = false;
         }
-        
-        this.loading = false;
       },
       error: (err) => {
         console.error('Error loading quiz:', err);
         this.loading = false;
       }
     });
+  }
+
+  // 4. Función que traduce el objeto entero pieza por pieza
+  async traducirQuizCompleto(quizOriginal: QuizQuestion) {
+    try {
+      // Traducimos los campos principales
+      quizOriginal.category = await this.traducirTexto(quizOriginal.category);
+      quizOriginal.difficulty = await this.traducirTexto(quizOriginal.difficulty);
+      quizOriginal.text = await this.traducirTexto(quizOriginal.text);
+      quizOriginal.explanation = await this.traducirTexto(quizOriginal.explanation);
+
+      // Traducimos cada una de las respuestas iterando sobre el array
+      for (let answer of quizOriginal.answers) {
+        answer.text = await this.traducirTexto(answer.text);
+      }
+
+      // Cuando todo está traducido, lo pasamos a la variable principal y quitamos el loading
+      this.quiz = quizOriginal;
+      this.loading = false; 
+
+    } catch (error) {
+      console.error("Error al traducir el quiz:", error);
+      // Si falla la traducción (ej: se cae la API de MyMemory), lo mostramos en inglés para que no se rompa la app
+      this.quiz = quizOriginal;
+      this.loading = false;
+    }
+  }
+
+  // 5. Función que llama a la API gratuita de traducción (MyMemory)
+  async traducirTexto(texto: string): Promise<string> {
+    if (!texto) return '';
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=en|es`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    // Si la API devuelve la traducción, la usamos. Si no, devolvemos el texto original.
+    if (data && data.responseData && data.responseData.translatedText) {
+      return data.responseData.translatedText;
+    }
+    return texto;
   }
 
   // Ahora es mucho más fácil, el HTML nos pasará directamente si es correcta o no
