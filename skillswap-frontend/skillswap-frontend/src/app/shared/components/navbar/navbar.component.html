@@ -10,10 +10,15 @@
         <mat-icon class="nav-icon">people</mat-icon>
         <span>Comunidad</span>
       </a>
-      <!-- AÑADIDO: Minijuegos visible para todos -->
-      <a class="nav-link" routerLink="/minijuegos" routerLinkActive="active">
+ <!-- Minijuegos: Efecto borroso (VIP) si es invitado -->
+      <a class="nav-link" 
+         [routerLink]="authService.isAuthenticated() ? '/minijuegos' : '/register'" 
+         [routerLinkActive]="authService.isAuthenticated() ? 'active' : ''"
+         [ngClass]="{'blurred-link': !authService.isAuthenticated()}">
         <mat-icon class="nav-icon">gamepad</mat-icon>
         <span>Minijuegos</span>
+        <!-- Candadito extra para que quede claro que está bloqueado -->
+        <mat-icon *ngIf="!authService.isAuthenticated()" class="lock-icon" style="font-size: 14px; height: 14px; width: 14px; margin-left: 4px;">lock</mat-icon>
       </a>
       <ng-container *ngIf="authService.isAuthenticated()">
         <a class="nav-link" routerLink="/sessions" routerLinkActive="active">
@@ -83,10 +88,15 @@
       <mat-icon>people</mat-icon>
       <span>Comunidad</span>
     </a>
-    <!-- AÑADIDO: Minijuegos visible para todos en móvil -->
-    <a class="mobile-nav-link" routerLink="/minijuegos" routerLinkActive="active" (click)="mobileMenuOpen = false">
+ <!-- Minijuegos: Efecto borroso (VIP) si es invitado en móvil -->
+    <a class="mobile-nav-link" 
+       [routerLink]="authService.isAuthenticated() ? '/minijuegos' : '/register'" 
+       [routerLinkActive]="authService.isAuthenticated() ? 'active' : ''"
+       [ngClass]="{'blurred-link': !authService.isAuthenticated()}"
+       (click)="mobileMenuOpen = false">
       <mat-icon>gamepad</mat-icon>
       <span>Minijuegos</span>
+      <mat-icon *ngIf="!authService.isAuthenticated()" class="lock-icon" style="font-size: 18px; height: 18px; width: 18px; margin-left: auto;">lock</mat-icon>
     </a>
     <ng-container *ngIf="authService.isAuthenticated()">
       <a class="mobile-nav-link" routerLink="/sessions" routerLinkActive="active" (click)="mobileMenuOpen = false">
