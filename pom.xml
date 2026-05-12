@@ -85,18 +85,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
@@ -111,6 +99,8 @@
                                 <path>
                                     <groupId>org.projectlombok</groupId>
                                     <artifactId>lombok</artifactId>
+                                    <!-- AÑADE ESTA LÍNEA -->
+                                    <version>1.18.30</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
@@ -126,6 +116,8 @@
                                 <path>
                                     <groupId>org.projectlombok</groupId>
                                     <artifactId>lombok</artifactId>
+                                    <!-- AÑADE ESTA LÍNEA TAMBIÉN -->
+                                    <version>1.18.30</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>

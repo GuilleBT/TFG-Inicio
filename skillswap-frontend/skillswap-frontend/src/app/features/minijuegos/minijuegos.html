@@ -1,0 +1,34 @@
+<div class="minijuegos-container">
+  <h1>Reto de Programación Diario 💻</h1>
+
+  <div *ngIf="loading" class="loading">
+    <p>Cargando el reto de hoy...</p>
+  </div>
+
+  <div *ngIf="!loading && quiz" class="quiz-card">
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+      <span style="background: #007bff; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">{{ quiz.category }}</span>
+      <span style="background: #ff9800; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">{{ quiz.difficulty }}</span>
+    </div>
+
+    <h3>{{ quiz.text }}</h3>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+      <button *ngFor="let answer of quiz.answers" 
+              (click)="verificarRespuesta(answer.isCorrect)" 
+              [disabled]="respondido"
+              style="text-align: left; padding: 12px; border: 1px solid #ddd; background-color: #f8f9fa; color: #333;">
+        {{ answer.text }}
+      </button>
+    </div>
+
+    <div *ngIf="respondido" style="margin-top: 20px; padding: 15px; border-radius: 8px;" 
+         [ngStyle]="{'background-color': esCorrecto ? '#d4edda' : '#f8d7da', 'color': esCorrecto ? '#155724' : '#721c24'}">
+      <h4 style="margin-top:0; margin-bottom: 10px;">{{ esCorrecto ? '¡Correcto! Has ganado puntos.' : '¡Fallaste! Inténtalo de nuevo.' }}</h4>
+      
+      <p style="font-size: 14px; margin: 0;"><strong>Por qué:</strong> {{ quiz.explanation }}</p>
+      
+      <button (click)="loadQuiz()" style="margin-top: 15px; background: #333; color: white;">Siguiente Reto 🔄</button>
+    </div>
+  </div>
+</div>

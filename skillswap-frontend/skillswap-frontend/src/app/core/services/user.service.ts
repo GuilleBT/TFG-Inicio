@@ -41,6 +41,12 @@ export class UserService {
       map(list => list.map(r => this.mapToUserProfile(r)))
     );
   }
+  // Añade este método en src/app/core/services/user.service.ts
+  getAllUsers(): Observable<UserProfile[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/users/all`).pipe(
+      map(list => list.map(r => this.mapToUserProfile(r)))
+    );
+  }
 
   updateMyProfile(request: UpdateProfileRequest): Observable<UserProfile> {
     return this.http.put<any>(`${environment.apiUrl}/users/me`, request).pipe(

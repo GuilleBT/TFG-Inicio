@@ -97,20 +97,16 @@ public class AuthController {
         user.setRoles(roles);
 
         // 3. LA NUEVA LÓGICA: Asignar tecnologías que DOMINA con todos sus detalles
+// 3. LA NUEVA LÓGICA: Asignar tecnologías que DOMINA (Adaptado a tu User.java actual)
         if (signUpRequest.getTecnologiasDomina() != null) {
             for (TecnologiaDetalleRequest techRequest : signUpRequest.getTecnologiasDomina()) {
                 
+                // Buscamos la tecnología en la base de datos
                 Tecnologia tecnologia = tecnologiaRepository.findById(techRequest.getTecnologiaId())
                         .orElseThrow(() -> new RuntimeException("Error: Tecnología no encontrada."));
 
-                UsuarioTecnologia usuarioTecnologia = new UsuarioTecnologia();
-                usuarioTecnologia.setUsuario(user);
-                usuarioTecnologia.setTecnologia(tecnologia);
-                usuarioTecnologia.setNivel(techRequest.getNivel());
-                usuarioTecnologia.setAniosExperiencia(techRequest.getAniosExperiencia());
-                usuarioTecnologia.setPuntosFuertes(techRequest.getPuntosFuertes());
-
-                user.getTecnologiasDominaDetalle().add(usuarioTecnologia);
+                // Se la añadimos directamente a la lista que SÍ existe en User.java
+                user.getTecnologiasDomina().add(tecnologia);
             }
         }
 
