@@ -28,6 +28,14 @@ export class HomeComponent implements OnInit {
     { value: '∞', label: 'Tecnologías disponibles' },
   ];
 
+  heroLanguages = [
+    { nombre: 'Java', count: 92, color: '#4F46E5' },
+    { nombre: 'Angular', count: 78, color: '#DD0031' },
+    { nombre: 'Python', count: 65, color: '#16A34A' },
+    { nombre: 'React', count: 58, color: '#61DAFB' },
+    { nombre: 'Docker', count: 44, color: '#0EA5E9' },
+  ];
+
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {

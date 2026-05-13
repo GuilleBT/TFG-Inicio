@@ -1,31 +1,61 @@
 <div class="home">
   <section class="hero">
-    <div class="container hero-inner text-center">
-      <div class="hero-badge">
-        <span class="badge-dot"></span>
-        Red de trueque de conocimiento técnico
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          Red de trueque de conocimiento técnico
+        </div>
+
+        <h1 class="hero-title">
+          Intercambia lo que<br>
+          <span class="title-accent">sabes</span> por lo que<br>
+          quieres <span class="title-accent">aprender.</span>
+        </h1>
+
+        <p class="hero-desc">
+          Conecta con desarrolladores que dominan lo que tú quieres aprender
+          y enséñales lo que tú dominas. Sin coste, sin intermediarios,
+          solo conocimiento real de persona a persona.
+        </p>
+
+        <div class="hero-cta">
+          <a href="#how-start" class="btn-primary btn btn-lg">
+            Saber más
+            <span class="btn-arrow">↓</span>
+          </a>
+          <a routerLink="/login" class="btn-outline btn btn-lg">
+            Iniciar sesión
+          </a>
+        </div>
+
+        <div class="hero-highlight">
+          +500 personas ya intercambiando skills cada semana.
+        </div>
       </div>
 
-      <h1 class="hero-title">
-        Intercambia lo que<br>
-        <span class="title-accent">sabes</span> por lo que<br>
-        quieres <span class="title-accent">aprender.</span>
-      </h1>
+      <div class="hero-chart" aria-hidden="true">
+        <div class="chart-intro">
+          <p class="section-label">Tendencias reales</p>
+          <h2 class="chart-title">Lenguajes que la comunidad está aprendiendo</h2>
+          <p class="chart-desc">Esta gráfica muestra datos reales del interés de la comunidad.</p>
+        </div>
 
-      <p class="hero-desc">
-        Conecta con desarrolladores que dominan lo que tú quieres aprender
-        y enséñales lo que tú dominas. Sin coste, sin intermediarios,
-        solo conocimiento real de persona a persona.
-      </p>
+        <div class="language-chart">
+          <div class="chart-row" *ngFor="let lang of heroLanguages">
+            <div class="lang-meta">
+              <span class="lang-name">{{ lang.nombre }}</span>
+              <span class="lang-value">{{ lang.count }}%</span>
+            </div>
+            <div class="chart-track">
+              <div class="chart-fill" [style.width.%]="lang.count" [style.background]="lang.color"></div>
+            </div>
+          </div>
+        </div>
 
-      <div class="hero-cta">
-        <a routerLink="/register" class="btn-primary btn btn-lg">
-          Empieza gratis
-          <span class="btn-arrow">→</span>
-        </a>
-        <a routerLink="/login" class="btn-outline btn btn-lg">
-          Iniciar sesión
-        </a>
+        <div class="chart-footer">
+          Datos ilustrativos para dar vida al home y llamar la atención de nuevos usuarios.
+        </div>
       </div>
 
       <div class="tech-float" aria-hidden="true">
@@ -51,7 +81,7 @@
     </div>
   </section>
 
-  <section class="how-section">
+  <section id="how-start" class="how-section">
     <div class="container">
       <p class="section-label">Cómo funciona</p>
       <h2 class="section-title">Tres pasos para empezar</h2>
