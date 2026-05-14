@@ -3,9 +3,11 @@ package com.example.trabajofinalgrado.Controller;
 import com.example.trabajofinalgrado.DTOs.Request.CrearSesionRequest;
 import com.example.trabajofinalgrado.DTOs.Response.SesionResponseDTO;
 import com.example.trabajofinalgrado.Model.EstadoSesion;
+import com.example.trabajofinalgrado.Model.Notificacion;
 import com.example.trabajofinalgrado.Model.Sesion;
 import com.example.trabajofinalgrado.Model.Tecnologia;
 import com.example.trabajofinalgrado.Model.User;
+import com.example.trabajofinalgrado.Repository.NotificacionRepository;
 import com.example.trabajofinalgrado.Repository.SesionRepository;
 import com.example.trabajofinalgrado.Repository.TecnologiaRepository;
 import com.example.trabajofinalgrado.Repository.UserRepository;
@@ -32,6 +34,10 @@ public class SesionController {
 
     @Autowired
     private TecnologiaRepository tecnologiaRepository;
+
+    // Inyectamos el repositorio de notificaciones
+    @Autowired
+    private NotificacionRepository notificacionRepository;
 
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -87,7 +93,13 @@ public class SesionController {
             sesion.setTecnologia(tec);
         }
 
-        return ResponseEntity.ok(SesionResponseDTO.from(sesionRepository.save(sesion)));
+        Sesion savedSesion = sesionRepository.save(sesion);
+
+        // NOTIFICACIÓN: Avisamos al receptor de que tiene una nueva solicitud
+        String mensaje = solicitante.getNombre() + " ha solicitado una sesión contigo.";
+        notificacionRepository.save(new Notificacion(receptor.getId(), mensaje));
+
+        return ResponseEntity.ok(SesionResponseDTO.from(savedSesion));
     }
 
     @PatchMapping("/{id}/confirm")
@@ -104,7 +116,13 @@ public class SesionController {
         }
 
         sesion.setEstado(EstadoSesion.CONFIRMADA);
-        return ResponseEntity.ok(SesionResponseDTO.from(sesionRepository.save(sesion)));
+        Sesion savedSesion = sesionRepository.save(sesion);
+
+        // NOTIFICACIÓN: Avisamos al solicitante de que su sesión fue aceptada
+        String mensaje = user.getNombre() + " ha aceptado tu solicitud de sesión.";
+        notificacionRepository.save(new Notificacion(sesion.getSolicitante().getId(), mensaje));
+
+        return ResponseEntity.ok(SesionResponseDTO.from(savedSesion));
     }
 
     @PatchMapping("/{id}/complete")
@@ -140,7 +158,17 @@ public class SesionController {
         }
 
         sesion.setEstado(EstadoSesion.CANCELADA);
-        return ResponseEntity.ok(SesionResponseDTO.from(sesionRepository.save(sesion)));
+        Sesion savedSesion = sesionRepository.save(sesion);
+
+        // NOTIFICACIÓN: Avisamos a la otra persona de que se ha cancelado
+        Long idDestino = sesion.getSolicitante().getId().equals(user.getId()) 
+                ? sesion.getReceptor().getId() 
+                : sesion.getSolicitante().getId();
+        
+        String mensaje = user.getNombre() + " ha cancelado la sesión.";
+        notificacionRepository.save(new Notificacion(idDestino, mensaje));
+
+        return ResponseEntity.ok(SesionResponseDTO.from(savedSesion));
     }
 
     @DeleteMapping("/{id}")

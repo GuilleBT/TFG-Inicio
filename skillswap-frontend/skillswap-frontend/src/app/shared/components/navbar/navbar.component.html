@@ -10,14 +10,13 @@
         <mat-icon class="nav-icon">people</mat-icon>
         <span>Comunidad</span>
       </a>
- <!-- Minijuegos: Efecto borroso (VIP) si es invitado -->
+      <!-- Minijuegos: Efecto borroso (VIP) si es invitado -->
       <a class="nav-link" 
          [routerLink]="authService.isAuthenticated() ? '/minijuegos' : '/register'" 
          [routerLinkActive]="authService.isAuthenticated() ? 'active' : ''"
          [ngClass]="{'blurred-link': !authService.isAuthenticated()}">
         <mat-icon class="nav-icon">gamepad</mat-icon>
         <span>Minijuegos</span>
-        <!-- Candadito extra para que quede claro que está bloqueado -->
         <mat-icon *ngIf="!authService.isAuthenticated()" class="lock-icon" style="font-size: 14px; height: 14px; width: 14px; margin-left: 4px;">lock</mat-icon>
       </a>
       <ng-container *ngIf="authService.isAuthenticated()">
@@ -34,14 +33,38 @@
 
     <!-- Usuario autenticado -->
     <div class="navbar-user" *ngIf="authService.isAuthenticated()">
+      
+      <!-- CAMPANA DE NOTIFICACIONES -->
+      <button mat-icon-button [matMenuTriggerFor]="notifMenu" class="notif-btn" style="color: white; margin-right: 8px;">
+        <mat-icon [matBadge]="cantidadPendientes" matBadgeColor="warn" [matBadgeHidden]="cantidadPendientes === 0">
+          notifications
+        </mat-icon>
+      </button>
+
+      <!-- MENÚ DESPLEGABLE DE NOTIFICACIONES -->
+      <mat-menu #notifMenu="matMenu" class="user-dropdown">
+        <div style="padding: 12px 16px; font-weight: 800; font-size: 14px; color: var(--text-muted);">Tus notificaciones</div>
+        <div class="menu-divider"></div>
+        
+        <div *ngIf="cantidadPendientes === 0" style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 13px;">
+          No tienes avisos nuevos
+        </div>
+
+        <button mat-menu-item *ngFor="let notif of notificaciones" (click)="leerNotificacion(notif.id)">
+          <mat-icon style="color: var(--accent);">info</mat-icon>
+          <span style="font-size: 13px;">{{ notif.mensaje }}</span>
+        </button>
+      </mat-menu>
+
+      <!-- PERFIL DE USUARIO -->
       <a class="user-avatar-btn" routerLink="/profile" [matMenuTriggerFor]="userMenu">
         <div class="avatar-circle" *ngIf="!currentUser()?.avatarUrl">
           {{ getInitials() }}
         </div>
-            <span class="streak-badge" *ngIf="currentUser()?.rachaDiasAprendiendo != null">
-              <span class="streak-icon">🔥</span>
-            <span class="streak-count">{{ currentUser()?.rachaDiasAprendiendo ?? 0 }}</span>
-          </span>
+        <span class="streak-badge" *ngIf="currentUser()?.rachaDiasAprendiendo != null">
+          <span class="streak-icon">🔥</span>
+          <span class="streak-count">{{ currentUser()?.rachaDiasAprendiendo ?? 0 }}</span>
+        </span>
         <img
           *ngIf="currentUser()?.avatarUrl"
           [src]="currentUser()?.avatarUrl"
@@ -54,6 +77,7 @@
         <mat-icon class="chevron">expand_more</mat-icon>
       </a>
 
+      <!-- MENÚ DEL USUARIO -->
       <mat-menu #userMenu="matMenu" class="user-dropdown">
         <a mat-menu-item routerLink="/profile">
           <mat-icon>person</mat-icon>
@@ -94,7 +118,7 @@
       <mat-icon>people</mat-icon>
       <span>Comunidad</span>
     </a>
- <!-- Minijuegos: Efecto borroso (VIP) si es invitado en móvil -->
+    <!-- Minijuegos: Efecto borroso (VIP) si es invitado en móvil -->
     <a class="mobile-nav-link" 
        [routerLink]="authService.isAuthenticated() ? '/minijuegos' : '/register'" 
        [routerLinkActive]="authService.isAuthenticated() ? 'active' : ''"
