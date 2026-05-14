@@ -84,6 +84,12 @@
       </span>
     </div>
     <div class="card__actions">
+      
+      <!-- 👇 NUEVO: Botón de Banear (Solo se renderiza si es ADMIN) 👇 -->
+      <button *ngIf="isAdmin" class="btn-ban btn-sm" (click)="onBanClick($event)" title="Banear a este usuario">
+        <mat-icon>gavel</mat-icon>
+      </button>
+
       <a [routerLink]="['/profile', displayUser.id]" class="btn btn-ghost btn-sm">
         <mat-icon>person</mat-icon>
         Perfil

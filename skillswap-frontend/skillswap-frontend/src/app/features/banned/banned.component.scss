@@ -1,0 +1,137 @@
+/* Fondo oscuro general */
+.banned-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 70px);
+  background-color: #0b0f19; /* Azul muy muy oscuro, casi negro tech */
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Tarjeta principal Dark Mode */
+.banned-card {
+  background: #111827; /* Gris azulado muy oscuro */
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Sombra dura de dark mode */
+  border: 1px solid #1f2937;
+  border-top: 4px solid #ef4444; /* Línea de peligro superior */
+
+  .icon-danger {
+    font-size: 50px;
+    height: 50px;
+    width: 50px;
+    color: #ef4444;
+    margin-bottom: 15px;
+    /* Efecto neón/glow para darle el toque hacker */
+    filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5)); 
+  }
+
+  .title {
+    color: #f3f4f6; /* Blanco roto brillante */
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: #9ca3af; /* Gris apagado */
+    font-size: 15px;
+    margin-bottom: 25px;
+  }
+
+  /* Caja del motivo */
+  .details-box {
+    background-color: #1f2937; /* Superficie elevada */
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 25px;
+    text-align: left;
+    border-left: 3px solid #ef4444;
+
+    h3 {
+      color: #9ca3af;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin: 0 0 5px 0;
+      letter-spacing: 1px;
+    }
+
+    .motivo-text {
+      color: #e5e7eb;
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0;
+    }
+  }
+
+  /* Caja del contador */
+  .countdown-box {
+    padding: 15px;
+    margin-bottom: 25px;
+
+    h3 {
+      color: #9ca3af;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+
+    .timer {
+      font-size: 28px;
+      font-weight: 700;
+      color: #ef4444;
+      /* Fuente de terminal para los números */
+      font-family: 'Fira Code', Consolas, Monaco, monospace; 
+      background: #000000; /* Fondo negro puro tipo terminal */
+      border: 1px solid #374151;
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Cuando el castigo acaba, se pone verde tech */
+    &.finished {
+      .timer {
+        color: #10b981;
+        text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        border-color: #064e3b;
+        font-size: 16px;
+        font-family: inherit;
+      }
+    }
+  }
+
+  .footer-note {
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 25px;
+  }
+
+  /* Botón adaptado al dark theme */
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    background-color: #3b82f6; /* Azul eléctrico */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #2563eb;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); /* Resplandor al pasar el ratón */
+    }
+  }
+}

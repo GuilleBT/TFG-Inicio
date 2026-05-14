@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatchingService } from '../../core/services/matching.service';
 import { TecnologiaService } from '../../core/services/tecnologia.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service'; 
 import { UserCardComponent } from '../../shared/components/user-card/user-card.component';
 import { LoginPromptComponent } from '../../shared/components/login-prompt/login-prompt.component';
 import { Match, Tecnologia, UserProfile } from '../../core/models/user.model';
@@ -39,10 +40,19 @@ export class MatchingComponent implements OnInit {
   gruposEnsena: TecnologiaGroup[] = [];
   gruposAprende: TecnologiaGroup[] = [];
 
+  // Control de Baneos
+  showBanModal = false;
+  userToBan: UserProfile | null = null;
+  banMotivo = '';
+  banDias = 1;
+  banHoras = 0; // <-- Asegurado en CamelCase
+  isBanning = false;
+
   constructor(
     private matchingService: MatchingService,
     private tecnologiaService: TecnologiaService,
     public authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
 
@@ -52,6 +62,10 @@ export class MatchingComponent implements OnInit {
       error: () => {}
     });
     this.loadMatches();
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.currentUser()?.rol === 'ADMIN';
   }
 
   buildGroups(): void {
@@ -167,5 +181,39 @@ export class MatchingComponent implements OnInit {
     this.router.navigate(['/sessions'], {
       queryParams: { receptorId: user.id, receptorNombre: `${user.nombre} ${user.apellido}` }
     });
+  }
+
+  // ── Lógica del Modal de Baneo ─────────────────────
+
+  abrirModalBan(usuario: UserProfile): void {
+    this.userToBan = usuario;
+    this.banMotivo = '';
+    this.banDias = 1;
+    this.banHoras = 0; // <-- Reseteo limpio
+    this.showBanModal = true;
+  }
+
+  cerrarModalBan(): void {
+    this.showBanModal = false;
+    this.userToBan = null;
+  }
+
+  confirmarBan(): void {
+    if (!this.userToBan || !this.banMotivo.trim()) return;
+    this.isBanning = true;
+
+    // Pasamos banHoras al servicio correctamente
+    this.userService.banearUsuario(this.userToBan.id, this.banMotivo, this.banDias, this.banHoras)
+      .subscribe({
+        next: () => {
+          this.matches = this.matches.filter(m => m.usuario.id !== this.userToBan!.id);
+          this.isBanning = false;
+          this.cerrarModalBan();
+        },
+        error: () => {
+          this.isBanning = false;
+          alert('Hubo un error de conexión al intentar aplicar el baneo.');
+        }
+      });
   }
 }

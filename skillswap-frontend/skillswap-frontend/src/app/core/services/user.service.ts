@@ -53,6 +53,14 @@ export class UserService {
       map(r => this.mapToUserProfile(r))
     );
   }
+  //
+banearUsuario(id: number, motivo: string, dias: number, horas: number) {
+  // Ahora la función acepta 'horas' como cuarto argumento
+  // Y lo metemos en el paquete (payload) que enviamos al backend
+  const payload = { motivo, dias, horas };
+  
+  return this.http.put(`${environment.apiUrl}/users/${id}/ban`, payload);
+}
 
   private mapToUserProfile(r: any): UserProfile {
     return {
@@ -72,6 +80,9 @@ export class UserService {
       habilidades:          r.habilidades ?? r.tecnologias_domina ?? [],
       intereses:            r.intereses ?? r.tecnologias_aprende ?? [],
       rachaDiasAprendiendo: r.rachaDiasAprendiendo ?? r.racha_dias_aprendiendo ?? 0,
+      rol:                  r.rol ?? 'USER', // Le ponemos 'USER' por defecto por si el backend no manda nada
+      baneadoHasta:         r.baneadoHasta ?? undefined,
+      motivoBaneo:          r.motivoBaneo ?? undefined
     };
   }
 }

@@ -159,7 +159,9 @@
               *ngFor="let m of perfectMatches"
               [match]="m"
               [showMatchScore]="true"
-              (requestSession)="onRequestSession($event)">
+              [isAdmin]="isAdmin"
+              (requestSession)="onRequestSession($event)"
+              (banRequest)="abrirModalBan(m.usuario)">
             </app-user-card>
           </div>
         </ng-container>
@@ -186,7 +188,9 @@
             *ngFor="let m of authService.isAuthenticated() ? otherMatches : filteredMatches"
             [match]="m"
             [showMatchScore]="authService.isAuthenticated()"
-            (requestSession)="onRequestSession($event)">
+            [isAdmin]="isAdmin"
+            (requestSession)="onRequestSession($event)"
+            (banRequest)="abrirModalBan(m.usuario)">
           </app-user-card>
         </div>
 
@@ -201,3 +205,42 @@
   [actionLabel]="loginPromptAction"
   (close)="showLoginPrompt = false">
 </app-login-prompt>
+
+<!-- MODAL DE BANEO (Solo se renderiza si eres ADMIN y quieres banear) -->
+<div class="modal-overlay" *ngIf="showBanModal && isAdmin">
+  <div class="modal-content ban-modal">
+    <div class="modal-header">
+      <h3 style="color: var(--text-primary);"><mat-icon class="text-danger" style="margin-right: 8px;">gavel</mat-icon> Banear a {{ userToBan?.nombre }}</h3>
+      <button class="close-btn" (click)="cerrarModalBan()"><mat-icon>close</mat-icon></button>
+    </div>
+    
+    <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+      <div class="field-group">
+        <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Motivo del castigo *</label>
+        <div class="input-wrap">
+          <input type="text" [(ngModel)]="banMotivo" class="search-input full-width" style="border: 1px solid var(--border-default); border-radius: 8px;" placeholder="Ej: Comportamiento tóxico o spam...">
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="field-group">
+          <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Días</label>
+          <input type="number" [(ngModel)]="banDias" min="0" class="search-input full-width" style="border: 1px solid var(--border-default); border-radius: 8px;">
+        </div>
+        <div class="field-group">
+          <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Horas</label>
+          <input type="number" [(ngModel)]="banHoras" min="0" max="23" class="search-input full-width" style="border: 1px solid var(--border-default); border-radius: 8px;">
+        </div>
+      </div>
+      
+      <p class="ban-warning">⚠️ Esta acción bloqueará al usuario y cancelará todas sus sesiones automáticamente.</p>
+    </div>
+    
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+      <button class="btn btn-ghost" (click)="cerrarModalBan()">Cancelar</button>
+      <button class="btn btn-danger" [disabled]="!banMotivo || isBanning" (click)="confirmarBan()">
+        {{ isBanning ? 'Aplicando condena...' : 'Aplicar Baneo' }}
+      </button>
+    </div>
+  </div>
+</div>

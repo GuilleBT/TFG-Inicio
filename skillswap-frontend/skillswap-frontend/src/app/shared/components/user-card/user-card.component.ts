@@ -17,7 +17,14 @@ export class UserCardComponent {
   @Input() match?: Match;
   @Input() user?: UserProfile;
   @Input() showMatchScore = true;
+  
+  // 👇 NUEVO: Input para saber si ocultar o mostrar el mazo
+  @Input() isAdmin = false; 
+
   @Output() requestSession = new EventEmitter<UserProfile>();
+  
+  // 👇 NUEVO: Output para avisar al componente padre (Matching)
+  @Output() banRequest = new EventEmitter<void>();
 
   get displayUser(): UserProfile | undefined {
     return this.match?.usuario ?? this.user;
@@ -62,5 +69,12 @@ export class UserCardComponent {
 
   onRequestSession(): void {
     if (this.displayUser) this.requestSession.emit(this.displayUser);
+  }
+
+  // 👇 NUEVO: Función que se ejecuta al darle al mazo
+  onBanClick(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation(); // Evita clics accidentales en enlaces padre
+    this.banRequest.emit();
   }
 }

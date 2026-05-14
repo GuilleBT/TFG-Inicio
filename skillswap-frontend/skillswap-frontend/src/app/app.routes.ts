@@ -1,7 +1,13 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { BannedComponent } from './features/banned/banned.component';
 
 export const routes: Routes = [
+
+   {
+    path: 'banned',
+    component: BannedComponent // <-- Usamos el componente directamente
+  },
   {
     path: '',
     loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
@@ -14,6 +20,9 @@ export const routes: Routes = [
     path: 'register',
     loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
   },
+ 
+  
+ 
   {
     path: 'matching',
     loadComponent: () => import('./features/matching/matching.component').then(m => m.MatchingComponent)

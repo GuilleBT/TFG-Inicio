@@ -59,15 +59,21 @@ export class AuthService {
   private handleAuth(response: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, response.token);
 
+   // En tu auth.service.ts
     const user: UserProfile = {
       id:         response.id,
       username:   response.username,
       email:      response.email,
-      nombre:     response.username, // el back no devuelve nombre en signin
+      nombre:     response.username, 
       apellido:   '',
       habilidades: [],
       intereses:   [],
-      rachaDiasAprendiendo: undefined
+      rachaDiasAprendiendo: undefined,
+      
+      // 👇 AQUÍ ES DONDE VA LA LÓGICA 👇
+      rol: (response.roles && response.roles.length > 0) 
+             ? response.roles[0].replace('ROLE_', '') 
+             : 'USER'
     };
 
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));

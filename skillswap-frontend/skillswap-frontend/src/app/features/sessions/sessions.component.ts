@@ -76,7 +76,8 @@ export class SessionsComponent implements OnInit {
           error: () => {
             const nombre = params['receptorNombre'] || '';
             if (nombre) {
-              this.selectedReceptor = { id: receptorId, nombre: nombre.split(' ')[0], apellido: nombre.split(' ')[1] ?? '', email: '', username: '', habilidades: [], intereses: [] };
+              // Por esta otra (le hemos añadido el rol al final):
+this.selectedReceptor = { id: receptorId, nombre: nombre.split(' ')[0], apellido: nombre.split(' ')[1] ?? '', email: '', username: '', habilidades: [], intereses: [], rol: 'USER' };
             }
           }
         });

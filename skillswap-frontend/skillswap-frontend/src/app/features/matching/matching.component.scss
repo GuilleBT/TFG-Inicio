@@ -447,10 +447,64 @@
   p { font-size: 13px; }
 }
 
-.btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
-
 @media (max-width: 768px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { display: none; }
   .layout:not(.layout--collapsed) .sidebar { display: none; }
+}
+
+// ── NUEVO: MODAL BANEO ───────────────────────────────────────
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  
+  h3 { display: flex; align-items: center; font-size: 18px; margin: 0; }
+}
+
+.close-btn {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  &:hover { color: var(--text-primary); }
+}
+
+.text-danger { color: var(--danger, #ef4444); }
+
+.full-width { width: 100%; box-sizing: border-box; }
+
+.btn-danger {
+  background: var(--danger, #ef4444); color: white;
+  border: none; padding: 10px 16px; border-radius: 8px;
+  font-weight: bold; cursor: pointer; transition: background 150ms;
+  &:hover { background: #dc2626; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.ban-warning {
+  font-size: 13px; color: var(--highlight, #fbbf24);
+  margin-top: 8px; padding: 10px 12px;
+  background: rgba(251, 191, 36, 0.1); border-radius: 6px;
+  line-height: 1.4;
 }

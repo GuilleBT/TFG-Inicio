@@ -52,16 +52,31 @@ export class LoginComponent {
 };
 
 this.authService.login(loginPayload).subscribe({
-      next: () => {
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/matching';
-        this.router.navigateByUrl(returnUrl);
-      },
-      error: (err) => {
-        this.loading = false;
+    next: () => {
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/matching';
+      this.router.navigateByUrl(returnUrl);
+    },
+    error: (err) => {
+      this.loading = false;
+
+      // 👇 EL NUEVO CANDADO DE BANEO (Error 403) 👇
+      if (err.status === 403 && err.error && err.error.message === "Tu cuenta está suspendida") {
+        
+        // Lo mandamos directo a la celda de castigo con los datos
+        this.router.navigate(['/banned'], {
+          queryParams: {
+            motivo: err.error.motivo,
+            hasta: err.error.hasta
+          }
+        });
+
+      } 
+      // 👇 TU LÓGICA ORIGINAL PARA EL RESTO DE ERRORES 👇
+      else {
         this.errorMessage = err.status === 401
-          ? 'Credenciales incorrectas. Revisa tu email y contraseña.'
+          ? 'Credenciales incorrectas. Revisa tu usuario/email y contraseña.'
           : 'Error al iniciar sesión. Inténtalo de nuevo.';
       }
-    });
-  }
-}
+    }
+  });
+  }}

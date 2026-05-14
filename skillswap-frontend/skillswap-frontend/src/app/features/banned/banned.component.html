@@ -1,0 +1,21 @@
+<div class="banned-screen">
+  <div class="banned-card">
+    <mat-icon class="icon-danger">gavel</mat-icon>
+    <h1 class="title">Acceso Restringido</h1>
+    <p class="subtitle">Tu cuenta ha sido suspendida temporalmente.</p>
+    
+    <div class="details-box">
+      <h3>Motivo de la expulsión</h3>
+      <p class="motivo-text">{{ motivo }}</p>
+    </div>
+
+    <div class="countdown-box" [class.finished]="countdown.includes('terminado')">
+      <h3>Tiempo restante de condena</h3>
+      <div class="timer">{{ countdown }}</div>
+    </div>
+
+    <p class="footer-note">Si crees que esto es un error, contacta con el administrador a través del soporte técnico de la plataforma.</p>
+    
+    <button class="btn btn-primary" routerLink="/login">Volver al inicio</button>
+  </div>
+</div>

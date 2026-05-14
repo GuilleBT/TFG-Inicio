@@ -301,3 +301,25 @@
     height: 15px !important;
   }
 }
+
+/* 👇 ESTILOS DEL BOTÓN DE BANEAR 👇 */
+.btn-ban {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger, #ef4444);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:hover {
+    background: var(--danger, #ef4444);
+    color: white;
+    border-color: var(--danger, #ef4444);
+  }
+  
+  mat-icon {
+    margin: 0 !important; /* Para que quede centrado sin texto al lado */
+  }
+}

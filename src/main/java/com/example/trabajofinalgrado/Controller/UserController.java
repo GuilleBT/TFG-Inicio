@@ -127,7 +127,47 @@ public class UserController {
                 
         return ResponseEntity.ok(results);
     }
+// ==========================================
+    // MÉTODO PARA BANEAR USUARIOS (Actualizado con Horas)
+    // ==========================================
+    @PutMapping("/{id}/ban")
+    @Transactional
+    public ResponseEntity<?> banUser(@PathVariable Long id, @RequestBody com.example.trabajofinalgrado.DTOs.Request.BanRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Sumamos tanto los días como las horas que vienen en el Request
+        java.time.LocalDateTime fechaFinBaneo = java.time.LocalDateTime.now()
+                .plusDays(request.getDias())
+                .plusHours(request.getHoras()); // <-- ¡Esto es lo que faltaba!
+
+        user.setBaneadoHasta(fechaFinBaneo);
+        user.setMotivoBaneo(request.getMotivo());
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of(
+            "mensaje", "Usuario baneado correctamente",
+            "baneadoHasta", fechaFinBaneo.toString()
+        ));
+    }
+
+    // ==========================================
+    // MÉTODO PARA QUITAR EL BANEO (Se queda igual)
+    // ==========================================
+    @PutMapping("/{id}/unban")
+    @Transactional
+    public ResponseEntity<?> unbanUser(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        user.setBaneadoHasta(null);
+        user.setMotivoBaneo(null);
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("mensaje", "Usuario desbaneado correctamente"));
+    }
     // He añadido los campos extra (bio, ubicacion, etc) para que Angular los reciba correctamente
     private Map<String, Object> toMap(User user, boolean includeEmail) {
         Map<String, Object> data = new HashMap<>();
@@ -143,7 +183,7 @@ public class UserController {
         data.put("imagen_perfil", user.getImagenPerfil());
         data.put("racha_dias_aprendiendo", user.getRachaDiasAprendiendo());
         data.put("rachaDiasAprendiendo", user.getRachaDiasAprendiendo());
-        
+        data.put("rol", user.getRol());
         data.put("tecnologias_domina", user.getTecnologiasDomina().stream()
                 .map(t -> Map.of("id", t.getId(), "nombre", t.getNombre(),
                         "iconoUrl", t.getIconoUrl() != null ? t.getIconoUrl() : ""))

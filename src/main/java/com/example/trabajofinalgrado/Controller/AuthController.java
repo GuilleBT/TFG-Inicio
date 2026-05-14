@@ -51,15 +51,37 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
-    @PostMapping("/signin") // Si en Angular usas /login, recuerda cambiar esto a /login
+    @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        
+        // 1. DEJAMOS QUE SPRING SECURITY HAGA SU TRABAJO (Validar credenciales)
+        // Si la contraseña está mal o el usuario no existe, Spring lanzará su 401 normal y no se rompe la app.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
+        // 2. ¡CREDENCIALES CORRECTAS! Sacamos los datos básicos del usuario que acaba de entrar
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        // 3. 🛡️ LA COMPROBACIÓN DE BANEO (Súper segura) 🛡️
+        // Buscamos al usuario en la BD para ver su fecha de castigo
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Error inesperado: Usuario no encontrado tras autenticar"));
+
+        if (user.getBaneadoHasta() != null && user.getBaneadoHasta().isAfter(java.time.LocalDateTime.now())) {
+            // ¡ESTÁ BANEADO! Le denegamos el token y le mandamos el error 403
+            return ResponseEntity
+                    .status(org.springframework.http.HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                        "message", "Tu cuenta está suspendida",
+                        "motivo", user.getMotivoBaneo() != null ? user.getMotivoBaneo() : "Incumplimiento de normas",
+                        "hasta", user.getBaneadoHasta().toString()
+                    ));
+        }
+
+        // 4. SI ESTÁ LIMPIO, LE DAMOS SU TOKEN COMO SIEMPRE
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());

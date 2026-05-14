@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +30,11 @@ public class User {
     
     private String nombre;
     private String apellido;
+    private String rol = "USER"; // Por defecto todos son USER. se cambiarás a ADMIN en la base de datos.
+    
+    private LocalDateTime baneadoHasta; // La fecha y hora exacta en la que se le levanta el baneo
+    
+    private String motivoBaneo;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

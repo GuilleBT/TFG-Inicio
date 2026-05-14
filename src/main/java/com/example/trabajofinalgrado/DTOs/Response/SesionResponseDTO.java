@@ -60,7 +60,6 @@ public class SesionResponseDTO {
         dto.setEstado(s.getEstado().name());
         dto.setNotas(s.getNotas());
         dto.setCreadoEn(s.getCreadoEn() != null ? s.getCreadoEn().format(FMT) : null);
-        
 
         dto.setTelefonoContacto(s.getTelefonoContacto());
 

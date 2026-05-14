@@ -154,3 +154,294 @@
 .review-author { font-size: 14px; font-weight: 600; display: block; margin-bottom: 2px; }
 .review-date { margin-left: auto; font-size: 12px; color: var(--text-muted); }
 .review-comment { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+// ── HEADER DEL PERFIL ───────────────────────────────────────
+.profile-header {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.profile-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.profile-avatar-wrap {
+  width: 120px;
+  height: 120px;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 2px solid var(--border-muted);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.avatar-large {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--bg-elevated), var(--border-default));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.avatar-img-large {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-streak-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  
+  .profile-streak-icon { font-size: 16px; }
+  .profile-streak-value { font-weight: 700; color: var(--highlight); font-size: 15px; }
+  .profile-streak-label { font-size: 12px; color: var(--highlight); font-weight: 500; }
+}
+
+.profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    align-items: center;
+  }
+}
+
+.name-row {
+  h1 { font-size: 28px; font-weight: 700; margin: 0 0 4px 0; color: var(--text-primary); }
+  .username { font-size: 14px; color: var(--accent); }
+}
+
+.bio {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 600px;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  
+  &.link {
+    text-decoration: none;
+    transition: color 150ms;
+    &:hover { color: var(--accent); }
+  }
+}
+
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-elevated);
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+
+  .stat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--success); }
+  .stat-icon.accent { color: var(--highlight); }
+  .stat-value { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+  .stat-label { font-size: 13px; color: var(--text-muted); }
+}
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    transition: all 150ms;
+    text-decoration: none;
+    
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+  
+  .btn-primary { background: var(--accent); color: #000; &:hover { background: #4cd8c2; } }
+  .btn-ghost { background: transparent; color: var(--text-primary); border: 1px solid var(--border-default); &:hover { border-color: var(--accent); color: var(--accent); } }
+}
+
+// ── MODO EDICIÓN (Y EL SELECTOR DE TECNOLOGÍAS) ───────────────
+.edit-card {
+  h2 { margin: 0 0 24px 0; font-size: 20px; }
+}
+
+.edit-form { display: flex; flex-direction: column; gap: 20px; }
+
+.field-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.field-group { display: flex; flex-direction: column; gap: 8px; }
+
+.field-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.input-wrapper {
+  position: relative;
+  display: flex; align-items: center;
+  background: var(--bg-elevated); border: 1px solid var(--border-default);
+  border-radius: 10px; transition: border-color 200ms;
+  &:focus-within { border-color: var(--accent); }
+}
+
+.input-icon { position: absolute; left: 12px; color: var(--text-muted); font-size: 18px; }
+
+.input-field {
+  width: 100%; background: transparent; border: none; outline: none;
+  padding: 12px 14px; color: var(--text-primary); font-size: 14px;
+  &.textarea-field { resize: vertical; min-height: 80px; }
+}
+
+.input-wrapper:has(.input-icon) .input-field { padding-left: 38px; }
+
+/* AQUÍ ESTÁ LA MAGIA QUE PERDISTE */
+.tech-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.tech-chip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:hover:not(.disabled-chip) { background: rgba(255,255,255,0.05); }
+
+  &.selected-skill {
+    background: rgba(94, 234, 212, 0.15);
+    border-color: rgba(94, 234, 212, 0.4);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  &.selected-interest {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: var(--highlight);
+    font-weight: 600;
+  }
+
+  &.disabled-chip {
+    opacity: 0.4;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+}
+
+.form-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 20px; }
+
+// ── SKILLS & REVIEWS ───────────────────────────────────────
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.skills-card {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.card-title {
+  display: flex; align-items: center; gap: 8px; font-size: 18px; margin: 0; color: var(--text-primary);
+  .title-icon { font-size: 20px; width: 20px; height: 20px; }
+  .skill-icon { color: var(--accent); }
+  .interest-icon { color: var(--highlight); }
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.empty-text { font-size: 14px; color: var(--text-muted); font-style: italic; margin: 0; }
+
+.reviews-section { display: flex; flex-direction: column; gap: 20px; }
+
+.reviews-list { display: flex; flex-direction: column; gap: 16px; }
+
+.review-item {
+  padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle);
+  &:last-child { border-bottom: none; padding-bottom: 0; }
+}
+
+.review-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+
+.review-avatar { width: 32px; height: 32px; background: var(--bg-elevated); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-secondary); border: 1px solid var(--border-default); }
+
+.review-meta { display: flex; flex-direction: column; gap: 2px; }
+
+.review-author { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+.review-date { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+.review-comment { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+.loading-state { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 100px 0; color: var(--text-muted); }
+.spinner-lg { width: 40px; height: 40px; border: 3px solid var(--border-default); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
