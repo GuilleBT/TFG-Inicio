@@ -81,6 +81,7 @@ public class SesionController {
         sesion.setDuracionMinutos(request.getDuracionMinutos());
         sesion.setEnlaceMeeting(request.getEnlaceMeeting());
         sesion.setEnlaceGithub(request.getEnlaceGithub());
+        sesion.setTelefonoContacto(request.getTelefonoContacto());
         sesion.setEstado(EstadoSesion.PENDIENTE);
 
         if (request.getFechaHora() != null && !request.getFechaHora().isBlank()) {

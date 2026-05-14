@@ -18,6 +18,7 @@ export interface Session {
   duracionMinutos: number;
   enlaceMeeting?: string;
   enlaceGithub?: string;
+  telefonoContacto?: string;
   estado: SessionStatus;
   notas?: string;
   creadoEn?: string;

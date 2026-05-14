@@ -69,6 +69,7 @@
           <input type="text" formControlName="titulo" class="input-field" placeholder="Ej: Intro a Spring Boot">
         </div>
       </div>
+      
       <div class="field-group">
         <label class="field-label">Descripción</label>
         <div class="input-wrapper">
@@ -76,6 +77,7 @@
                     placeholder="¿Qué vais a trabajar en la sesión?"></textarea>
         </div>
       </div>
+      
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">Fecha y hora *</label>
@@ -90,6 +92,7 @@
           </div>
         </div>
       </div>
+      
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">Enlace Meeting</label>
@@ -106,6 +109,17 @@
           </div>
         </div>
       </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">WhatsApp (Opcional)</label>
+          <div class="input-wrapper">
+            <mat-icon class="input-icon">phone</mat-icon>
+            <input type="tel" formControlName="telefonoContacto" class="input-field" placeholder="Ej: 600123456">
+          </div>
+        </div>
+      </div>
+
       <div class="form-footer">
         <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving || !selectedReceptor">
           <span class="spinner" *ngIf="saving"></span>
@@ -149,6 +163,7 @@
       </div>
       <h3 class="session-title">{{ s.titulo }}</h3>
       <p class="session-desc" *ngIf="s.descripcion">{{ s.descripcion }}</p>
+      
       <div class="session-meta">
         <span class="meta-chip"><mat-icon>schedule</mat-icon>{{ s.duracionMinutos }} min</span>
         <span class="meta-chip" *ngIf="s.tecnologia">{{ s.tecnologia.nombre }}</span>
@@ -157,14 +172,20 @@
           {{ isMyRequest(s) ? ('Para: ' + s.receptorNombre) : ('De: ' + s.solicitanteNombre) }}
         </span>
       </div>
-      <div class="session-links" *ngIf="s.enlaceMeeting || s.enlaceGithub">
+      
+      <!-- BOTONES INTEGRADOS AL ESTILO GHOST -->
+      <div class="session-links" *ngIf="s.enlaceMeeting || s.enlaceGithub || s.telefonoContacto">
         <a *ngIf="s.enlaceMeeting" [href]="s.enlaceMeeting" target="_blank" class="btn btn-ghost btn-sm">
           <mat-icon>video_call</mat-icon> Meeting
         </a>
         <a *ngIf="s.enlaceGithub" [href]="s.enlaceGithub" target="_blank" class="btn btn-ghost btn-sm">
           <mat-icon>code</mat-icon> GitHub
         </a>
+        <button *ngIf="s.telefonoContacto" (click)="contactarPorWhatsApp(s.telefonoContacto)" class="btn btn-ghost btn-sm whatsapp-ghost">
+          <mat-icon>chat</mat-icon> WhatsApp
+        </button>
       </div>
+
       <div class="session-actions">
         <button class="btn btn-primary btn-sm"
           *ngIf="!isMyRequest(s) && s.estado === 'PENDIENTE'" (click)="confirm(s)">

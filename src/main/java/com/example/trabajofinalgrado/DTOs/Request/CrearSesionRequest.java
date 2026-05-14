@@ -14,4 +14,5 @@ public class CrearSesionRequest {
     private Integer duracionMinutos;
     private String enlaceMeeting;
     private String enlaceGithub;
+    private String telefonoContacto;
 }

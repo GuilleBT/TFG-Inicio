@@ -44,6 +44,8 @@ public class Sesion {
 
     private String enlaceGithub;
 
+    private String telefonoContacto;
+    
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private EstadoSesion estado;
