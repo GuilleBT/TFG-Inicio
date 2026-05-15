@@ -4,13 +4,13 @@ import com.example.trabajofinalgrado.Model.ERole;
 import com.example.trabajofinalgrado.Model.Role;
 import com.example.trabajofinalgrado.Model.User;
 import com.example.trabajofinalgrado.Model.Tecnologia;
-import com.example.trabajofinalgrado.Model.UsuarioTecnologia; // Entidad nueva
+import com.example.trabajofinalgrado.Model.UsuarioTecnologia;
 import com.example.trabajofinalgrado.Repository.RoleRepository;
 import com.example.trabajofinalgrado.Repository.UserRepository;
 import com.example.trabajofinalgrado.Repository.TecnologiaRepository;
 import com.example.trabajofinalgrado.DTOs.Request.LoginRequest;
 import com.example.trabajofinalgrado.DTOs.Request.SignupRequest;
-import com.example.trabajofinalgrado.DTOs.Request.TecnologiaDetalleRequest; // Molde nuevo
+import com.example.trabajofinalgrado.DTOs.Request.TecnologiaDetalleRequest;
 import com.example.trabajofinalgrado.DTOs.Response.JwtResponse;
 import com.example.trabajofinalgrado.Security.JWT.JwtUtils;
 import com.example.trabajofinalgrado.Security.Service.UserDetailsImpl;
@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -53,22 +54,16 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        
-        // 1. DEJAMOS QUE SPRING SECURITY HAGA SU TRABAJO (Validar credenciales)
-        // Si la contraseña está mal o el usuario no existe, Spring lanzará su 401 normal y no se rompe la app.
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        // 2. ¡CREDENCIALES CORRECTAS! Sacamos los datos básicos del usuario que acaba de entrar
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        // 3. 🛡️ LA COMPROBACIÓN DE BANEO (Súper segura) 🛡️
-        // Buscamos al usuario en la BD para ver su fecha de castigo
         User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Error inesperado: Usuario no encontrado tras autenticar"));
 
         if (user.getBaneadoHasta() != null && user.getBaneadoHasta().isAfter(java.time.LocalDateTime.now())) {
-            // ¡ESTÁ BANEADO! Le denegamos el token y le mandamos el error 403
             return ResponseEntity
                     .status(org.springframework.http.HttpStatus.FORBIDDEN)
                     .body(Map.of(
@@ -78,7 +73,6 @@ public class AuthController {
                     ));
         }
 
-        // 4. SI ESTÁ LIMPIO, LE DAMOS SU TOKEN COMO SIEMPRE
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
@@ -86,10 +80,17 @@ public class AuthController {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
+        return ResponseEntity.ok(new JwtResponse(
+                jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles,
+                user.getRol()
+        ));
     }
 
-    @PostMapping("/register") // Ajustado a la ruta correcta de Angular
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest().body("Error: Username is already taken!");
@@ -99,49 +100,36 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
 
-        // 1. Crear la cuenta del usuario
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
         user.setNombre(signUpRequest.getNombre());
         user.setApellido(signUpRequest.getApellido());
-        
-        // --- LOS NUEVOS CAMPOS ---
         user.setExperienciaBreve(signUpRequest.getExperienciaBreve());
         user.setImagenPerfil(signUpRequest.getImagenPerfil());
 
-        // 2. Asignar rol por defecto (ROLE_USER)
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         roles.add(userRole);
         user.setRoles(roles);
 
-        // 3. LA NUEVA LÓGICA: Asignar tecnologías que DOMINA con todos sus detalles
-// 3. LA NUEVA LÓGICA: Asignar tecnologías que DOMINA (Adaptado a tu User.java actual)
         if (signUpRequest.getTecnologiasDomina() != null) {
             for (TecnologiaDetalleRequest techRequest : signUpRequest.getTecnologiasDomina()) {
-                
-                // Buscamos la tecnología en la base de datos
                 Tecnologia tecnologia = tecnologiaRepository.findById(techRequest.getTecnologiaId())
                         .orElseThrow(() -> new RuntimeException("Error: Tecnología no encontrada."));
-
-                // Se la añadimos directamente a la lista que SÍ existe en User.java
                 user.getTecnologiasDomina().add(tecnologia);
             }
         }
 
-        // 4. Asignar tecnologías que APRENDE (Esto se queda igual, como una lista simple)
         if (signUpRequest.getTecnologiasAprendeIds() != null && !signUpRequest.getTecnologiasAprendeIds().isEmpty()) {
             List<Tecnologia> aprendeList = tecnologiaRepository.findAllById(signUpRequest.getTecnologiasAprendeIds());
             user.setTecnologiasAprende(new HashSet<>(aprendeList));
         }
 
-        // 5. Guardar el usuario completo en BD
         userRepository.save(user);
 
-        // Devolvemos el mensaje envuelto en un Map para que Angular lo lea como JSON perfecto
         return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
 }

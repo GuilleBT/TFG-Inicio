@@ -17,14 +17,12 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // ─── LOGIN ─────
   login(request: AuthRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/signin`, request).pipe(
       tap(response => this.handleAuth(response))
     );
   }
 
-  // ─── REGISTRO (Corregida la URL y el tipo de respuesta) ──
   register(request: RegisterRequest): Observable<any> {
     return this.http.post(`${environment.apiUrl}/auth/register`, request);
   }
@@ -59,21 +57,16 @@ export class AuthService {
   private handleAuth(response: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, response.token);
 
-   // En tu auth.service.ts
     const user: UserProfile = {
       id:         response.id,
       username:   response.username,
       email:      response.email,
-      nombre:     response.username, 
+      nombre:     response.username,
       apellido:   '',
       habilidades: [],
       intereses:   [],
       rachaDiasAprendiendo: undefined,
-      
-      // 👇 AQUÍ ES DONDE VA LA LÓGICA 👇
-      rol: (response.roles && response.roles.length > 0) 
-             ? response.roles[0].replace('ROLE_', '') 
-             : 'USER'
+      rol: response.rol ?? 'USER'
     };
 
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));

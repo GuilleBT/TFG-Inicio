@@ -1,0 +1,215 @@
+<div class="admin-page">
+
+  <div class="admin-header">
+    <div>
+      <h1 class="admin-title">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Panel de Administración
+      </h1>
+      <p class="admin-subtitle">Gestión de usuarios y moderación de la plataforma</p>
+    </div>
+    <button class="btn btn-outline btn-sm" (click)="loadUsers()">
+      <mat-icon>refresh</mat-icon>
+      Actualizar
+    </button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--total">
+        <mat-icon>group</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalUsers }}</span>
+        <span class="stat-label">Usuarios totales</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--active">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalActivos }}</span>
+        <span class="stat-label">Activos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--banned">
+        <mat-icon>gavel</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalBaneados }}</span>
+        <span class="stat-label">Baneados</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--admin">
+        <mat-icon>shield</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalAdmins }}</span>
+        <span class="stat-label">Admins</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Buscar por nombre, username o email..."
+          class="search-input"
+        />
+        <button class="clear-btn" *ngIf="searchQuery" (click)="searchQuery = ''">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-tab" [class.active]="filterEstado === 'todos'" (click)="filterEstado = 'todos'">
+          Todos ({{ totalUsers }})
+        </button>
+        <button class="filter-tab" [class.active]="filterEstado === 'activos'" (click)="filterEstado = 'activos'">
+          Activos ({{ totalActivos }})
+        </button>
+        <button class="filter-tab filter-tab--danger" [class.active]="filterEstado === 'baneados'" (click)="filterEstado = 'baneados'">
+          Baneados ({{ totalBaneados }})
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner-lg"></div>
+      <span>Cargando usuarios...</span>
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Habilidades</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers" [class.row--banned]="isBanned(user)">
+            <td>
+              <div class="user-cell">
+                <div class="avatar-circle-sm">{{ getInitials(user) }}</div>
+                <div class="user-cell-info">
+                  <span class="user-cell-name">{{ user.nombre }} {{ user.apellido }}</span>
+                  <span class="user-cell-username">&#64;{{ user.username }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="cell-muted">{{ user.email || '—' }}</td>
+            <td>
+              <span class="role-badge" [class.role-badge--admin]="user.rol === 'ADMIN'">
+                <mat-icon>{{ user.rol === 'ADMIN' ? 'shield' : 'person' }}</mat-icon>
+                {{ user.rol || 'USER' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [class.status-badge--banned]="isBanned(user)">
+                <mat-icon>{{ isBanned(user) ? 'block' : 'check_circle' }}</mat-icon>
+                {{ isBanned(user) ? 'Baneado' : 'Activo' }}
+              </span>
+            </td>
+            <td>
+              <div class="skills-preview">
+                <span class="skill-tag" *ngFor="let s of (user.habilidades | slice:0:3)">{{ s.nombre }}</span>
+                <span class="skill-more" *ngIf="user.habilidades && user.habilidades.length > 3">+{{ user.habilidades.length - 3 }}</span>
+                <span class="cell-muted" *ngIf="!user.habilidades?.length">—</span>
+              </div>
+            </td>
+            <td>
+              <div class="action-btns">
+                <a [routerLink]="['/profile', user.id]" class="action-btn action-btn--view" title="Ver perfil">
+                  <mat-icon>open_in_new</mat-icon>
+                </a>
+                <button
+                  *ngIf="!isBanned(user) && user.rol !== 'ADMIN'"
+                  class="action-btn action-btn--ban"
+                  title="Banear usuario"
+                  (click)="abrirModalBan(user)">
+                  <mat-icon>gavel</mat-icon>
+                </button>
+                <button
+                  *ngIf="isBanned(user)"
+                  class="action-btn action-btn--unban"
+                  title="Desbanear usuario"
+                  (click)="desbanear(user)">
+                  <mat-icon>lock_open</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-table" *ngIf="filteredUsers.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <p>No se encontraron usuarios con ese criterio.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" *ngIf="showBanModal">
+  <div class="modal-box">
+    <div class="modal-box-header">
+      <h3>
+        <mat-icon style="color: var(--danger);">gavel</mat-icon>
+        Banear a {{ userToBan?.nombre }} {{ userToBan?.apellido }}
+      </h3>
+      <button class="modal-close" (click)="cerrarModalBan()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-box-body">
+      <div class="field-group">
+        <label class="field-label">Motivo del baneo *</label>
+        <div class="input-wrapper">
+          <mat-icon class="input-icon">notes</mat-icon>
+          <input type="text" [(ngModel)]="banMotivo" class="input-field" placeholder="Ej: Comportamiento tóxico, spam...">
+        </div>
+      </div>
+
+      <div class="duration-grid">
+        <div class="field-group">
+          <label class="field-label">Días</label>
+          <div class="input-wrapper">
+            <input type="number" [(ngModel)]="banDias" min="0" class="input-field">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Horas</label>
+          <div class="input-wrapper">
+            <input type="number" [(ngModel)]="banHoras" min="0" max="23" class="input-field">
+          </div>
+        </div>
+      </div>
+
+      <div class="ban-warning">
+        ⚠️ El usuario perderá el acceso hasta el fin del período. Sus sesiones activas se cancelarán automáticamente.
+      </div>
+    </div>
+
+    <div class="modal-box-footer">
+      <button class="btn btn-ghost" (click)="cerrarModalBan()">Cancelar</button>
+      <button class="btn btn-danger" [disabled]="!banMotivo.trim() || isBanning" (click)="confirmarBan()">
+        <mat-icon *ngIf="!isBanning">gavel</mat-icon>
+        {{ isBanning ? 'Aplicando...' : 'Confirmar baneo' }}
+      </button>
+    </div>
+  </div>
+</div>

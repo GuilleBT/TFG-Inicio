@@ -25,11 +25,8 @@ export interface UserProfile {
   rachaDiasAprendiendo?: number;
   fechaRegistro?: string;
   activo?: boolean;
-  
-  // 👇 AQUÍ SOLO EL TIPO, SIN LÓGICA 👇
-  rol: string; 
-  
-  baneadoHasta?: string; 
+  rol: string;
+  baneadoHasta?: string;
   motivoBaneo?: string;
 }
 
@@ -47,6 +44,7 @@ export interface AuthResponse {
   username: string;
   email: string;
   roles: string[];
+  rol: string;
 }
 
 export interface AuthRequest {

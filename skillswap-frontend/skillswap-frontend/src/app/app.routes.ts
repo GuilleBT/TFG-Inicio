@@ -3,10 +3,9 @@ import { authGuard } from './core/guards/auth.guard';
 import { BannedComponent } from './features/banned/banned.component';
 
 export const routes: Routes = [
-
-   {
+  {
     path: 'banned',
-    component: BannedComponent // <-- Usamos el componente directamente
+    component: BannedComponent
   },
   {
     path: '',
@@ -20,9 +19,6 @@ export const routes: Routes = [
     path: 'register',
     loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
   },
- 
-  
- 
   {
     path: 'matching',
     loadComponent: () => import('./features/matching/matching.component').then(m => m.MatchingComponent)
@@ -49,6 +45,11 @@ export const routes: Routes = [
   {
     path: 'minijuegos',
     loadComponent: () => import('./features/minijuegos/minijuegos').then(m => m.Minijuegos),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [authGuard]
   },
   {

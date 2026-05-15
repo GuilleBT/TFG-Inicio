@@ -44,6 +44,10 @@
       <!-- MENÚ DESPLEGABLE DE NOTIFICACIONES -->
       <mat-menu #notifMenu="matMenu" class="user-dropdown">
         <div style="padding: 12px 16px; font-weight: 800; font-size: 14px; color: var(--text-muted);">Tus notificaciones</div>
+        <a mat-menu-item routerLink="/admin" *ngIf="currentUser()?.rol === 'ADMIN'">
+          <mat-icon style="color: var(--accent);">admin_panel_settings</mat-icon>
+          <span>Panel Admin</span>
+        </a>
         <div class="menu-divider"></div>
         
         <div *ngIf="cantidadPendientes === 0" style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 13px;">
@@ -90,6 +94,10 @@
         <a mat-menu-item routerLink="/reviews">
           <mat-icon>star</mat-icon>
           <span>Mis Reseñas</span>
+        </a>
+        <a mat-menu-item routerLink="/admin" *ngIf="currentUser()?.rol === 'ADMIN'">
+          <mat-icon style="color: var(--accent);">admin_panel_settings</mat-icon>
+          <span>Panel Admin</span>
         </a>
         <div class="menu-divider"></div>
         <button mat-menu-item (click)="logout()" class="logout-item">

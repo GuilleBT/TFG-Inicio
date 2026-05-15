@@ -41,7 +41,7 @@ export class UserService {
       map(list => list.map(r => this.mapToUserProfile(r)))
     );
   }
-  // Añade este método en src/app/core/services/user.service.ts
+
   getAllUsers(): Observable<UserProfile[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/users/all`).pipe(
       map(list => list.map(r => this.mapToUserProfile(r)))
@@ -53,14 +53,14 @@ export class UserService {
       map(r => this.mapToUserProfile(r))
     );
   }
-  //
-banearUsuario(id: number, motivo: string, dias: number, horas: number) {
-  // Ahora la función acepta 'horas' como cuarto argumento
-  // Y lo metemos en el paquete (payload) que enviamos al backend
-  const payload = { motivo, dias, horas };
-  
-  return this.http.put(`${environment.apiUrl}/users/${id}/ban`, payload);
-}
+
+  banearUsuario(id: number, motivo: string, dias: number, horas: number): Observable<any> {
+    return this.http.put(`${environment.apiUrl}/users/${id}/ban`, { motivo, dias, horas });
+  }
+
+  desbanearUsuario(id: number): Observable<any> {
+    return this.http.put(`${environment.apiUrl}/users/${id}/unban`, {});
+  }
 
   private mapToUserProfile(r: any): UserProfile {
     return {
@@ -80,7 +80,7 @@ banearUsuario(id: number, motivo: string, dias: number, horas: number) {
       habilidades:          r.habilidades ?? r.tecnologias_domina ?? [],
       intereses:            r.intereses ?? r.tecnologias_aprende ?? [],
       rachaDiasAprendiendo: r.rachaDiasAprendiendo ?? r.racha_dias_aprendiendo ?? 0,
-      rol:                  r.rol ?? 'USER', // Le ponemos 'USER' por defecto por si el backend no manda nada
+      rol:                  r.rol ?? 'USER',
       baneadoHasta:         r.baneadoHasta ?? undefined,
       motivoBaneo:          r.motivoBaneo ?? undefined
     };
