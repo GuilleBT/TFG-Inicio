@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { HttpClient } from '@angular/common/http';
 import { interval, Subscription } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
+import { startWith, switchMap, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
@@ -45,17 +45,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // 1. Lógica original de la racha
     if (this.authService.isAuthenticated()) {
-      // 1. Lógica original de la racha
       if (this.currentUser()?.rachaDiasAprendiendo == null) {
         this.userService.getMyProfile().subscribe({
           next: user => this.authService.updateCurrentUser(user),
           error: () => {}
         });
       }
-      // 2. Iniciamos el radar de notificaciones
-      this.iniciarRadarNotificaciones();
     }
+    
+    // 2. Iniciamos el radar de notificaciones (siempre encendido, pero filtrado)
+    this.iniciarRadarNotificaciones();
   }
 
   ngOnDestroy(): void {
@@ -68,6 +69,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.pollingSub = interval(15000)
       .pipe(
         startWith(0),
+        // MAGIA: El radar solo dispara la petición HTTP si el usuario está autenticado
+        filter(() => this.authService.isAuthenticated()),
         switchMap(() => this.http.get<any[]>('http://localhost:8080/api/notificaciones/pendientes'))
       )
       .subscribe({
