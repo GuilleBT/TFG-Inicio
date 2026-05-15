@@ -66,7 +66,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   iniciarRadarNotificaciones(): void {
-    this.pollingSub = interval(15000)
+    this.pollingSub = interval(5000)
       .pipe(
         startWith(0),
         // MAGIA: El radar solo dispara la petición HTTP si el usuario está autenticado
